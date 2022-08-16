@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="KekeTerminal-jvm-1.0-SNAPSHOT">
+    <output-path>$PROJECT_DIR$/KekeTerminal/build/libs</output-path>
+    <root id="archive" name="KekeTerminal-jvm-1.0-SNAPSHOT.jar" />
+  </artifact>
+</component>
