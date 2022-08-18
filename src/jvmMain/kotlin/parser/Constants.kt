@@ -1,50 +1,68 @@
 package parser
 
 // 状态机 代表当前状态
-enum class ParserState(val int: Int) {
-    GROUND(0),
-    ESCAPE(1),
-    ESCAPE_INTERMEDIATE(2),
-    CSI_ENTRY(3),
-    CSI_PARAM(4),
-    CSI_INTERMEDIATE(5),
-    CSI_IGNORE(6),
-    SOS_PM_APC_STRING(7),
-    OSC_STRING(8),
-    DCS_ENTRY(9),
-    DCS_PARAM(10),
-    DCS_IGNORE(11),
-    DCS_INTERMEDIATE(12),
-    DCS_PASS_THROUGH(13);
+enum class ParserState {
+    /**
+     *   This is the initial state of the parser, and the state used to consume all characters other than components
+     *   of escape and control sequences.
+     */
+    GROUND,
+
+    /**
+     * This state is entered whenever the C0 control ESC is received.
+     */
+    ESCAPE,
+
+    /**
+     * This state is entered when an intermediate character arrives in an escape sequence.
+     */
+    ESCAPE_INTERMEDIATE,
+
+    /**
+     * This state is entered when the control function CSI is recognised, in 7-bit or 8-bit form.
+     */
+    CSI_ENTRY,
+
+    /**
+     * This state is entered when a parameter character is recognised in a control sequence.
+     */
+    CSI_PARAM,
+
+    /**
+     * This state is entered when an intermediate character is recognised in a control sequence.
+     */
+    CSI_INTERMEDIATE,
+
+    /**
+     * This state is used to consume remaining characters of a control sequence that is still being recognised,
+     * but has already been disregarded as malformed.
+     */
+    CSI_IGNORE,
+    /**
+     * This state is entered when the control function DCS is recognised, in 7-bit or 8-bit form.
+     */
+    DCS_ENTRY,
+
+    SOS_PM_APC_STRING,
+    OSC_STRING,
+
+
+    DCS_PARAM,
+    DCS_IGNORE,
+    DCS_INTERMEDIATE,
+    DCS_PASS_THROUGH;
 }
 
 
 /**
  * Internal actions of EscapeSequenceParser.
  */
-enum class ParserAction(val code:Int) {
-    IGNORE(0),
-    ERROR(1),
-    PRINT(2),
-    EXECUTE(3),
-    OSC_START(4),
-    OSC_PUT(5),
-    OSC_END(6),
-    CSI_DISPATCH(7),
-    PARAM(8),
-    COLLECT(9),
-    ESC_DISPATCH(10),
-    CLEAR(11),
-    DCS_HOOK(12),
-    DCS_PUT(13),
-    DCS_UNHOOK(14),
+enum class ParserAction {
+    IGNORE, ERROR, PRINT, EXECUTE, OSC_START, OSC_PUT, OSC_END, CSI_DISPATCH, PARAM, COLLECT, ESC_DISPATCH, CLEAR, DCS_HOOK, DCS_PUT, DCS_UNHOOK,
 }
 
-enum class OscState(val code:Int) {
-    START(0),
-    ID(1),
-    PAYLOAD(2),
-    ABORT(3),
+enum class OscState {
+    START, ID, PAYLOAD, ABORT,
 }
 
 // payload limit for OSC and DCS
