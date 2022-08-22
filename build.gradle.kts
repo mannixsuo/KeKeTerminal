@@ -45,8 +45,15 @@ compose.desktop {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
+val testVersion = "5.4.2"
 dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.pty4j/pty4j
     implementation("org.jetbrains.pty4j:pty4j:0.12.7")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+    testImplementation("io.kotest:kotest-runner-junit5:${testVersion}")
+    testImplementation("io.kotest:kotest-assertions-core:${testVersion}")
+    testImplementation("io.kotest:kotest-property:${testVersion}")
 }

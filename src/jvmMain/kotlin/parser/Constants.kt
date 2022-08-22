@@ -79,6 +79,14 @@ enum class ParserState(val state: Int) {
      * until the control function ST is recognised.
      */
     SOS_PM_APC_STRING(13),
+    ;
+
+    companion object {
+        fun of(x: Int): ParserState {
+            return ParserState.values()[x]
+        }
+    }
+
 
 }
 
@@ -190,9 +198,14 @@ enum class ParserAction(val action: Int) {
      * this action calls the previously selected handler function with an “end of data” parameter.
      * This allows the handler to finish neatly.
      */
-    DCS_UNHOOK(14),
+    DCS_UNHOOK(14), ;
 
 
+    companion object {
+        fun of(i: Int): ParserAction {
+            return ParserAction.values()[i]
+        }
+    }
 }
 
 enum class OscState {

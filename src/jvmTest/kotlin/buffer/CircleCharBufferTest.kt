@@ -1,34 +1,12 @@
 package buffer
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.spec.style.Test
+import io.kotest.matchers.shouldBe
 
-internal class CircleCharBufferTest {
-
-    @org.junit.jupiter.api.Test
-    fun readNextChar() {
-
+@Test
+class CircleCharBufferTest : FunSpec({
+    test("my first test") {
+        1 + 2 shouldBe 3
     }
-
-    @org.junit.jupiter.api.Test
-    fun mark() {
-    }
-
-    @org.junit.jupiter.api.Test
-    fun reset() {
-    }
-
-    @org.junit.jupiter.api.Test
-    fun pushChars() {
-        val circleCharBuffer = CircularList(3 )
-        runBlocking {
-            launch {
-                circleCharBuffer.pushChars(charArrayOf('1', '2', '3'))
-                assertEquals(circleCharBuffer.readNextChar(), '1')
-                assertEquals(circleCharBuffer.readNextChar(), '2')
-                assertEquals(circleCharBuffer.readNextChar(), '3')
-            }
-        }
-    }
-}
+})
