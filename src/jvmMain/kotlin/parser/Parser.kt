@@ -168,7 +168,113 @@ class Parser {
             // csi entry -> ground
             // 40-7E / csi_dispatch
             addRange(0x40, 0x7e, ParserState.CSI_ENTRY, ParserAction.CSI_DISPATCH, ParserState.GROUND)
-            // TODO
+
+            // --------------------------------------- osc --------------------------
+            // escape -> osc string
+            // 5D
+            // entry / osc_start
+            add(0x5d, ParserState.ESCAPE, ParserAction.OSC_START, ParserState.OSC_STRING)
+
+            // event 00-17,19,1C-1F / ignore
+            addRange(0x00, 0x17, ParserState.OSC_STRING, ParserAction.IGNORE, ParserState.OSC_STRING)
+            addRange(0x1c, 0x1f, ParserState.OSC_STRING, ParserAction.IGNORE, ParserState.OSC_STRING)
+            add(0x19, ParserState.OSC_STRING, ParserAction.IGNORE, ParserState.OSC_STRING)
+
+            // event 20-7F / osc_put
+            addRange(0x20, 0x7f, ParserState.OSC_STRING, ParserAction.OSC_PUT, ParserState.OSC_STRING)
+
+            // exit / osc_end
+            add(0x9c, ParserState.OSC_STRING, ParserAction.OSC_END, ParserState.GROUND)
+
+            // ---------------------------- dcs -------------------------------------------
+            // escape -> dcs entry 50
+            // entry / clear
+            add(0x50, ParserState.ESCAPE, ParserAction.CLEAR, ParserState.DCS_ENTRY)
+            // event 00-17,19,1C-1F / ignore event 7F / ignore
+            add(0x19, ParserState.DCS_ENTRY, ParserAction.IGNORE, ParserState.DCS_ENTRY)
+            add(0x7f, ParserState.DCS_ENTRY, ParserAction.IGNORE, ParserState.DCS_ENTRY)
+            addRange(0x00, 0x17, ParserState.DCS_ENTRY, ParserAction.IGNORE, ParserState.DCS_ENTRY)
+            addRange(0x1c, 0x1f, ParserState.DCS_ENTRY, ParserAction.IGNORE, ParserState.DCS_ENTRY)
+
+            // dcs entry -> dcs intermediate
+            // 20-2F / collect
+            addRange(0x20, 0x2f, ParserState.DCS_ENTRY, ParserAction.COLLECT, ParserState.DCS_INTERMEDIATE)
+            // event 00-17,19,1C-1F / ignore  event 7F / ignore
+            add(0x19, ParserState.DCS_INTERMEDIATE, ParserAction.IGNORE, ParserState.DCS_INTERMEDIATE)
+            add(0x7f, ParserState.DCS_INTERMEDIATE, ParserAction.IGNORE, ParserState.DCS_INTERMEDIATE)
+            addRange(0x00, 0x17, ParserState.DCS_INTERMEDIATE, ParserAction.IGNORE, ParserState.DCS_INTERMEDIATE)
+            addRange(0x1c, 0x1f, ParserState.DCS_INTERMEDIATE, ParserAction.IGNORE, ParserState.DCS_INTERMEDIATE)
+            // event 20-2F / collect
+            addRange(0x20, 0x2f, ParserState.DCS_INTERMEDIATE, ParserAction.COLLECT, ParserState.DCS_INTERMEDIATE)
+
+            // dcs entry -> dcs ignore
+            // 3A
+            add(0x3a, ParserState.DCS_ENTRY, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            // event 00-17,19,1C-1F,20-7F / ignore
+            addRange(0x00, 0x17, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            add(0x19, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            addRange(0x1c, 0x1f, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            addRange(0x20, 0x7f, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            // dcs ignore -> ground 9c
+            add(0x9c, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.GROUND)
+
+            // dcs entry -> dcs param
+            // 30-39,3B / param
+            // 3C-3F / collect
+            add(0x3b, ParserState.DCS_ENTRY, ParserAction.PARAM, ParserState.DCS_PARAM)
+            addRange(0x30, 0x39, ParserState.DCS_ENTRY, ParserAction.PARAM, ParserState.DCS_PARAM)
+            addRange(0x3c, 0x3f, ParserState.DCS_ENTRY, ParserAction.COLLECT, ParserState.DCS_PARAM)
+
+            // event 00-17,19,1C-1F / ignore
+            add(0x19, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_PARAM)
+            addRange(0x00, 0x17, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_PARAM)
+            addRange(0x1c, 0x1f, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_PARAM)
+
+            // event 30-39,3B / param
+            addRange(0x30, 0x39, ParserState.DCS_PARAM, ParserAction.PARAM, ParserState.DCS_PARAM)
+            add(0x3b, ParserState.DCS_PARAM, ParserAction.PARAM, ParserState.DCS_PARAM)
+
+            // event 7F / ignore
+            add(0x7f, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_PARAM)
+
+
+            // dcs entry -> dcs pass through
+            // 40-7E
+            // entry / hook
+            addRange(0x40, 0x7e, ParserState.DCS_ENTRY, ParserAction.DCS_HOOK, ParserState.DCS_PASS_THROUGH)
+            // event 00-17,19,1C-1F,20-7E / put
+            addRange(0x00, 0x17, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_PUT, ParserState.DCS_PASS_THROUGH)
+            addRange(0x1c, 0x1f, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_PUT, ParserState.DCS_PASS_THROUGH)
+            addRange(0x20, 0x7e, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_PUT, ParserState.DCS_PASS_THROUGH)
+            add(0x19, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_PUT, ParserState.DCS_PASS_THROUGH)
+
+            // event 7F / ignore
+            add(0x7f, ParserState.DCS_PASS_THROUGH, ParserAction.IGNORE, ParserState.DCS_PASS_THROUGH)
+
+            // exit / unhook 9c
+            add(0x9c, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_UNHOOK, ParserState.GROUND)
+
+            // dcs param -> dcs ignore
+            // 3A,3C-3F
+            add(0x3a, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            addRange(0x3c, 0x3f, ParserState.DCS_PARAM, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+
+            // dcs intermediate -> dcs ignore
+            // 30 - 3f
+            addRange(0x30, 0x3f, ParserState.DCS_INTERMEDIATE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+
+            // dcs intermediate -> dcs pass through
+            // 40-7E
+            addRange(0x40, 0x7e, ParserState.DCS_INTERMEDIATE, ParserAction.DCS_HOOK, ParserState.DCS_PASS_THROUGH)
+
+            // dcs param -> dcs intermediate
+            // 20-2F / collect
+            addRange(0x20, 0x2f, ParserState.DCS_PARAM, ParserAction.COLLECT, ParserState.DCS_INTERMEDIATE)
+
+            // dcs param -> dcs pass through
+            // 40-7E
+            addRange(0x40, 0x7e, ParserState.DCS_PARAM, ParserAction.DCS_HOOK, ParserState.DCS_PASS_THROUGH)
+
         }
     }
 
