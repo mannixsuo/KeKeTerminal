@@ -6,11 +6,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
 import com.pty4j.PtyProcessBuilder
+import org.slf4j.LoggerFactory
 import shell.LocalPty
 import shell.Shell
-import java.io.IOException
-import java.io.InputStreamReader
+import terminal.Terminal
 
 @Composable
 @Preview
@@ -27,35 +29,15 @@ fun App() {
 }
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    val localShell: Shell = LocalPty(PtyProcessBuilder(arrayOf("cmd.exe")).start())
+    val terminal = Terminal(localShell)
+    terminal.start()
+    Window(onCloseRequest = {
+        exitApplication()
+        terminal.stop()
+    }) {
         App()
     }
-    val localShell: Shell = LocalPty(PtyProcessBuilder(arrayOf("cmd.exe")).start())
-    val channelInputStreamReader = localShell.getChannelInputStreamReader()
-    val channelOutputStreamWriter = localShell.getChannelOutputStreamWriter()
-    Thread {
-        val inputStreamReader = InputStreamReader(System.`in`)
-        val buf = CharArray(1024)
-        var length: Int
-        try {
-            while (inputStreamReader.read(buf).also { length = it } != -1) {
-                val s = String(buf, 0, length)
-                if ("\n" == s) {
-                    channelOutputStreamWriter.write(13)
-                } else {
-                    channelOutputStreamWriter.write(buf, 0, length)
-                }
-                channelOutputStreamWriter.flush()
-            }
-        } catch (ignore: IOException) {
-        }
-    }.start()
-
-    Thread {
-        val buf = CharArray(1024)
-        var length: Int
-        while (channelInputStreamReader.read(buf).also { length = it } != -1) {
-            print(String(buf, 0, length))
-        }
-    }.start()
+    val parentLogger = LoggerFactory.getLogger("kotlin") as Logger
+    parentLogger.level = Level.DEBUG
 }

@@ -1,12 +1,11 @@
 package widget
 
+import terminal.Terminal
+
 /**
  * A terminalWidget represent a terminal connection
  */
-interface TerminalWidget {
-    /**
-     * get this terminal's currentState
-     */
-    fun getCurrentState();
+class TerminalWidget(terminal: Terminal) {
+
 
 }

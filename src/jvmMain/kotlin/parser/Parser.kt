@@ -1,16 +1,18 @@
 package parser
 
 import character.TransitionTable
+import org.slf4j.LoggerFactory
 import terminal.Terminal
 
-class Parser {
+class Parser(private val terminal: Terminal) {
+
+    private val logger = LoggerFactory.getLogger(Parser::class.java)
 
     var currentState = ParserState.GROUND
     var currentAction = ParserAction.PRINT
     private var params = Params()
     private var collect: Char = Char(0)
     private val transitionTable = TransitionTable(4096)
-    private val terminal = Terminal()
     private val c0c1ControlFunctionExecutors: Map<Int, Executor> = HashMap()
     private val oscHandler = OSCHandler()
     private var dcsHandler = DCSHandler()
@@ -286,12 +288,18 @@ class Parser {
         charArray.forEach { onChar(it.code) }
     }
 
+    fun onCharArray(charArray: CharArray) {
+        charArray.forEach { onChar(it.code) }
+    }
+
     private fun onChar(code: Int) {
         val (nextAction, nextState) = transitionTable.queryTable(code, currentState)
+        if (logger.isDebugEnabled) {
+            logger.debug("[ $currentState, $code ] -> [ $nextState, $nextAction ]")
+        }
         when (nextAction) {
             ParserAction.IGNORE, ParserAction.ERROR -> {}
             ParserAction.PRINT -> {
-                println("ParserAction.PRINT")
                 print(Char(code))
             }
 
