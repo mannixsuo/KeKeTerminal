@@ -1,18 +1,53 @@
 package buffer
 
-interface BufferService {
+/**
+ * save all line in terminal
+ */
+interface IBufferService {
 
-    fun getColumns(): Int
+    fun getColumnSize(): Int
+    fun getTotalRow(): Int
+    fun getRowSize(): Int
+    fun getLine(index: Int): IBufferLine
+    fun addLine(line: IBufferLine)
+    fun insertLine(index: Int, line: IBufferLine)
+    fun deleteLine(index: Int)
 
-    fun getRows(): Int
+}
 
-    fun scroll()
+class BufferService : IBufferService {
 
-    fun scrollToBottom()
+    private val buffer = CircularList<IBufferLine>(Int.MAX_VALUE)
+    private var totalRow = 0
+    private var columnSize = 0
+    private var rowSize = 0
 
-    fun scrollToTop()
 
-    fun scrollToLine(line: Int)
+    override fun getColumnSize(): Int {
+        return columnSize
+    }
 
-    fun resize(columns: Int, rows: Int)
+    override fun getTotalRow(): Int {
+        return totalRow
+    }
+
+    override fun getRowSize(): Int {
+        return rowSize
+    }
+
+    override fun getLine(index: Int): IBufferLine {
+        return buffer.get(index) ?: BufferLine()
+    }
+
+    override fun addLine(line: IBufferLine) {
+        TODO("Not yet implemented")
+    }
+
+    override fun insertLine(index: Int, line: IBufferLine) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteLine(index: Int) {
+        TODO("Not yet implemented")
+    }
 }

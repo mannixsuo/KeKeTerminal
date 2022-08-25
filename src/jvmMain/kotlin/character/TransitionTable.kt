@@ -3,6 +3,7 @@ package character
 import character.TableShift.INDEX_STATE_SHIFT
 import character.TableShift.TRANSITION_ACTION_SHIFT
 import character.TableShift.TRANSITION_STATE_MASK
+import org.slf4j.LoggerFactory
 import parser.ParserAction
 import parser.ParserState
 
@@ -14,12 +15,16 @@ object TableShift {
 
 val blueprint = Array(256) { it }
 
+val NON_ASCII_PRINTABLE = 0xA0
+
 // https://vt100.net/emu/dec_ansi_parser
 
 /**
  * table[ state ... code] = action ... next_state
  */
 class TransitionTable(private val size: Int) {
+    private val logger = LoggerFactory.getLogger(TransitionTable::class.java)
+
     private lateinit var table: Array<Int>
 
     fun setDefault(action: ParserAction, next: ParserState) {
@@ -42,7 +47,10 @@ class TransitionTable(private val size: Int) {
     }
 
     fun queryTable(code: Int, currentState: ParserState): Pair<ParserAction, ParserState> {
-        val value = table[currentState.state shl INDEX_STATE_SHIFT or code]
+        if (logger.isDebugEnabled) {
+            logger.debug("queryTable [code:$code, codeChar:${code.toChar()}, currentState:$currentState]")
+        }
+        val value = table[currentState.state shl INDEX_STATE_SHIFT or (if (code < 0xA0) code else NON_ASCII_PRINTABLE)]
         val action: ParserAction = ParserAction.of(value shr TRANSITION_ACTION_SHIFT)
         val state: ParserState = ParserState.of(value and TRANSITION_STATE_MASK)
         return Pair(action, state)

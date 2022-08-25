@@ -1,20 +1,83 @@
 package buffer
 
-import java.util.concurrent.locks.ReentrantLock
 
+class CircularList<T> {
 
-class CircularList<T : Any> {
-    private val lock = ReentrantLock()
-    private var bufferSize = 4096
-    private lateinit var buffer: Array<T>
-    private var currentReadIndex = 0
-    private var currentWriteIndex = 0
-    private var currentMarkerIndex = 0
+    private lateinit var buffer: ArrayList<T?>
+
+    private var startIndex = 0
+
+    private var length = 0
+        set(newLength) {
+            if (newLength > field) {
+                for (i in 0 until newLength) {
+                    buffer[i] = null
+                }
+            }
+            field = newLength
+        }
+
+    private var maxLength = 0
+        set(newMaxLength) {
+            if (newMaxLength == field) {
+                return
+            }
+            // Reconstruct array, starting at index 0. Only transfer values from the
+            // indexes 0 to length.
+            val newArray = ArrayList<T?>(newMaxLength)
+            val minLength = newMaxLength.coerceAtMost(this.maxLength)
+            for (i in 0 until minLength) {
+                newArray[i] = this.buffer[getCyclicIndex(i)]
+            }
+            this.buffer = newArray
+            field = newMaxLength
+            this.startIndex = 0
+        }
 
     constructor()
 
     constructor(size: Int) {
-        this.bufferSize = size
+        this.maxLength = size
+        this.buffer = ArrayList(size)
+    }
+
+    /**
+     * gets a value from circular list
+     */
+    fun get(index: Int): T? {
+        return this.buffer[getCyclicIndex(index)]
+    }
+
+    /**
+     * gets a value at index on circular list
+     */
+    fun set(index: Int, value: T?) {
+        this.buffer[getCyclicIndex(index)] = value
+    }
+
+    /**
+     * Pushes a new value onto the list, wrapping around to the start of the array, overriding index 0
+     * if the maximum length is reached.
+     * @param value The value to push onto the list.
+     */
+    fun push(value: T?) {
+        this.buffer[getCyclicIndex(length)] = value
+        if (this.length == this.maxLength) {
+            this.startIndex = ++this.startIndex % this.maxLength
+        } else {
+            this.length++
+        }
+    }
+
+    /**
+     * pop the element at last of the array
+     */
+    fun pop(): T? {
+        return this.buffer[this.getCyclicIndex(this.length-- - 1)];
+    }
+
+    private fun getCyclicIndex(index: Int): Int {
+        return (startIndex + index) % this.maxLength
     }
 
 

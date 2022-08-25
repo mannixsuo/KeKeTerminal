@@ -370,7 +370,20 @@ class Parser(private val terminal: Terminal) {
     }
 
     private fun csiDispatch(collect: Char, params: Params, code: Int): Executor {
-        TODO("Not yet implemented")
-    }
+        return when (code.toChar()) {
+            '@' -> {
+                object : Executor {
+                    override fun execute(terminal: Terminal) {
+                    }
+                }
+            }
 
+            else-> {
+                object : Executor {
+                    override fun execute(terminal: Terminal) {
+                    }
+                }
+            }
+        }
+    }
 }

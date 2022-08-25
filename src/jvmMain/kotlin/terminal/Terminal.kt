@@ -5,7 +5,7 @@ import shell.Shell
 import java.io.IOException
 import java.io.InputStreamReader
 
-class Terminal(shell: Shell) {
+class Terminal(shell: Shell,private val terminalConfig: TerminalConfig) {
     private val channelInputStreamReader = shell.getChannelInputStreamReader()
     private val channelOutputStreamWriter = shell.getChannelOutputStreamWriter()
     private val parser: Parser = Parser(this)

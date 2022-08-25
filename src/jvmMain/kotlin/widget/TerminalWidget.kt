@@ -7,5 +7,4 @@ import terminal.Terminal
  */
 class TerminalWidget(terminal: Terminal) {
 
-
 }

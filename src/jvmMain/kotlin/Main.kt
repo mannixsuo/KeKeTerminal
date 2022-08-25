@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import shell.LocalPty
 import shell.Shell
 import terminal.Terminal
+import terminal.TerminalConfig
 
 @Composable
 @Preview
@@ -29,8 +30,14 @@ fun App() {
 }
 
 fun main() = application {
-    val localShell: Shell = LocalPty(PtyProcessBuilder(arrayOf("cmd.exe")).start())
-    val terminal = Terminal(localShell)
+    val terminalConfig = TerminalConfig()
+    val localShell: Shell = LocalPty(
+        PtyProcessBuilder(arrayOf("cmd.exe"))
+            .setInitialColumns(terminalConfig.columns)
+            .setInitialRows(terminalConfig.rows)
+            .start()
+    )
+    val terminal = Terminal(localShell, terminalConfig)
     terminal.start()
     Window(onCloseRequest = {
         exitApplication()
