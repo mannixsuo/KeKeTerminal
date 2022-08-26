@@ -1,6 +1,6 @@
 package buffer
 
-import androidx.compose.ui.graphics.Color
+import java.awt.Color
 import java.awt.Font
 
 val defaultTheme = Theme()
@@ -12,14 +12,14 @@ class Theme {
 
     class Colors {
 
-        val black = Color.Black
-        val red = Color.Red
-        val green = Color.Green
-        val yellow = Color.Yellow
-        val blue = Color.Blue
-        val magenta = Color.Magenta
-        val cyan = Color.Cyan
-        val white = Color.White
+        val black = Color.BLACK
+        val red = Color.RED
+        val green = Color.GREEN
+        val yellow = Color.YELLOW
+        val blue = Color.BLUE
+        val magenta = Color.MAGENTA
+        val cyan = Color.CYAN
+        val white = Color.WHITE
         val defaultForeground = black
         val defaultBackground = white
 

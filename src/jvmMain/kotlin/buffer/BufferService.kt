@@ -1,5 +1,7 @@
 package buffer
 
+import terminal.TerminalConfig
+
 /**
  * save all line in terminal
  */
@@ -15,9 +17,10 @@ interface IBufferService {
 
 }
 
-class BufferService : IBufferService {
+class BufferService(terminalConfig: TerminalConfig) : IBufferService {
 
-    private val buffer = CircularList<IBufferLine>(Int.MAX_VALUE)
+    private val buffer = CircularList<IBufferLine>(10)
+
     private var totalRow = 0
     private var columnSize = 0
     private var rowSize = 0
@@ -40,7 +43,7 @@ class BufferService : IBufferService {
     }
 
     override fun addLine(line: IBufferLine) {
-        TODO("Not yet implemented")
+        buffer.push(line)
     }
 
     override fun insertLine(index: Int, line: IBufferLine) {
@@ -50,4 +53,10 @@ class BufferService : IBufferService {
     override fun deleteLine(index: Int) {
         TODO("Not yet implemented")
     }
+
+    override fun toString(): String {
+        return buffer.toString()
+    }
+
+
 }

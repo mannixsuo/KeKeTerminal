@@ -3,11 +3,11 @@ package buffer
 
 class CircularList<T> {
 
-    private lateinit var buffer: ArrayList<T?>
+    private lateinit var buffer: Array<Any?>
 
-    private var startIndex = 0
+    var startIndex = 0
 
-    private var length = 0
+    var length = 0
         set(newLength) {
             if (newLength > field) {
                 for (i in 0 until newLength) {
@@ -24,7 +24,7 @@ class CircularList<T> {
             }
             // Reconstruct array, starting at index 0. Only transfer values from the
             // indexes 0 to length.
-            val newArray = ArrayList<T?>(newMaxLength)
+            val newArray = Array<Any?>(newMaxLength) { null }
             val minLength = newMaxLength.coerceAtMost(this.maxLength)
             for (i in 0 until minLength) {
                 newArray[i] = this.buffer[getCyclicIndex(i)]
@@ -38,14 +38,14 @@ class CircularList<T> {
 
     constructor(size: Int) {
         this.maxLength = size
-        this.buffer = ArrayList(size)
+        this.buffer = Array(size) { null }
     }
 
     /**
      * gets a value from circular list
      */
     fun get(index: Int): T? {
-        return this.buffer[getCyclicIndex(index)]
+        return this.buffer[getCyclicIndex(index)] as T?
     }
 
     /**
@@ -60,7 +60,7 @@ class CircularList<T> {
      * if the maximum length is reached.
      * @param value The value to push onto the list.
      */
-    fun push(value: T?) {
+    fun push(value: T) {
         this.buffer[getCyclicIndex(length)] = value
         if (this.length == this.maxLength) {
             this.startIndex = ++this.startIndex % this.maxLength
@@ -73,11 +73,20 @@ class CircularList<T> {
      * pop the element at last of the array
      */
     fun pop(): T? {
-        return this.buffer[this.getCyclicIndex(this.length-- - 1)];
+        return this.buffer[this.getCyclicIndex(this.length-- - 1)] as T?
     }
 
     private fun getCyclicIndex(index: Int): Int {
         return (startIndex + index) % this.maxLength
+    }
+
+    override fun toString(): String {
+        val builder = StringBuffer()
+        for (element in buffer) {
+            builder.append(element.toString())
+            builder.append("\n")
+        }
+        return builder.toString()
     }
 
 

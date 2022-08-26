@@ -10,12 +10,52 @@ interface IAttributeData {
 }
 
 /**
- * represent a character
+ * represent character
  */
 interface ICellData : IAttributeData {
-    fun isCombined(): Boolean
     fun getWidth(): Int
-    fun getChars(): List<Char>
+    fun getChar(): Char
+}
+
+class CellData(
+    private val char: Char,
+    private val fg: Color,
+    private val bg: Color,
+) : ICellData {
+
+    constructor(
+        char: Char, fg: Color, bg: Color, bold: Boolean, italic: Boolean
+    ) : this(char, fg, bg) {
+        this.bold = bold
+        this.italic = italic
+    }
+
+    private var bold: Boolean = false
+    private var italic: Boolean = false
+
+    override fun getFg(): Color {
+        return fg
+    }
+
+    override fun getBg(): Color {
+        return bg
+    }
+
+    override fun isBold(): Boolean {
+        return bold
+    }
+
+    override fun isItalic(): Boolean {
+        return italic
+    }
+
+    override fun getWidth(): Int {
+        return 1
+    }
+
+    override fun getChar(): Char {
+        return char
+    }
 }
 
 
@@ -33,16 +73,15 @@ interface IBufferLine {
 
 }
 
-class BufferLine:IBufferLine{
-    override var length: Int
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var isWrapped: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
+class BufferLine : IBufferLine {
+    private var cells: ArrayList<ICellData> = ArrayList()
+
+    override var length: Int = 0
+
+    override var isWrapped: Boolean = false
 
     override fun get(index: Int): ICellData {
-        TODO("Not yet implemented")
+        return cells[index]
     }
 
     override fun putChar(char: Char) {
@@ -50,6 +89,17 @@ class BufferLine:IBufferLine{
     }
 
     override fun putCell(cell: ICellData) {
-        TODO("Not yet implemented")
+        cells.add(cell)
     }
+
+    override fun toString(): String {
+        val buffer = StringBuffer()
+        for (cell in cells) {
+            buffer.append(cell.getChar())
+        }
+        return buffer.toString()
+    }
+
+
 }
+

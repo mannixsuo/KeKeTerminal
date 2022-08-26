@@ -301,6 +301,7 @@ class Parser(private val terminal: Terminal) {
             ParserAction.IGNORE, ParserAction.ERROR -> {}
             ParserAction.PRINT -> {
                 print(Char(code))
+                terminal.printChar(code)
             }
 
             ParserAction.EXECUTE -> {
@@ -378,7 +379,7 @@ class Parser(private val terminal: Terminal) {
                 }
             }
 
-            else-> {
+            else -> {
                 object : Executor {
                     override fun execute(terminal: Terminal) {
                     }
