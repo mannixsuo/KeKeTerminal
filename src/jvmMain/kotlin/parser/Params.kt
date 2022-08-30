@@ -20,4 +20,11 @@ class Params {
             buffer.append(code.toChar())
         }
     }
+
+    fun get(index: Int): Int {
+        if (index > length) {
+            return 0
+        }
+        return params[index].toInt()
+    }
 }

@@ -10,11 +10,23 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
+    val bufferService: IBufferService = BufferService(terminalConfig)
+
+    /**
+     * current cursor position x
+     */
+    var currentCursorX = 0
+
+    /**
+     * current cursor position y
+     */
+    var currentCursorY = 0
+
+
     private val channelInputStreamReader = shell.getChannelInputStreamReader()
     private val channelOutputStreamWriter = shell.getChannelOutputStreamWriter()
     private val parser: Parser = Parser(this)
 
-    private val bufferService: IBufferService = BufferService(terminalConfig)
 
     private var nextCharFgColor = terminalConfig.theme.colors.defaultForeground
     private var nextCharBgColor = terminalConfig.theme.colors.defaultBackground
@@ -22,25 +34,20 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
     private var nextCharItalic = false
 
     private var currentLine: BufferLine = BufferLine()
-    private var currentLineAdd = false
 
 
-    // TODO need fix
     fun printChar(charCode: Int) {
         currentLine.putCell(
             CellData(
                 Char(charCode), nextCharFgColor, nextCharBgColor, nextCharBold, nextCharItalic
             )
         )
-        if (!currentLineAdd) {
-            bufferService.addLine(currentLine)
-            currentLineAdd = true
-        }
     }
 
     fun start() {
         startReadFromChannel()
         startWriteToChannel()
+        bufferService.addLine(currentLine)
     }
 
     fun stop() {

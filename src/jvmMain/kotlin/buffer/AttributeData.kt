@@ -1,5 +1,6 @@
 package buffer
 
+import parser.Direction
 import java.awt.Color
 
 interface IAttributeData {
@@ -30,6 +31,11 @@ class CellData(
         this.italic = italic
     }
 
+    constructor(cell: ICellData, char: Char) : this(char, cell.getFg(), cell.getBg()) {
+        this.bold = cell.isBold()
+        this.italic = cell.isItalic()
+    }
+
     private var bold: Boolean = false
     private var italic: Boolean = false
 
@@ -56,6 +62,12 @@ class CellData(
     override fun getChar(): Char {
         return char
     }
+
+    override fun toString(): String {
+        return char.toString()
+    }
+
+
 }
 
 
@@ -70,11 +82,17 @@ interface IBufferLine {
     fun get(index: Int): ICellData
     fun putChar(char: Char)
     fun putCell(cell: ICellData)
+    fun insertChar(startPosition: Int, count: Int, characterToInsert: Char)
+    fun shift(position: Direction, count: Int)
 
 }
 
+val defaultCellData = CellData(
+    ' ', defaultTheme.colors.defaultForeground, defaultTheme.colors.defaultBackground, bold = false, italic = false
+)
+
 class BufferLine : IBufferLine {
-    private var cells: ArrayList<ICellData> = ArrayList()
+    private var cells: Array<ICellData> = Array(100) { defaultCellData }
 
     override var length: Int = 0
 
@@ -89,7 +107,7 @@ class BufferLine : IBufferLine {
     }
 
     override fun putCell(cell: ICellData) {
-        cells.add(cell)
+        cells[length++] = cell
     }
 
     override fun toString(): String {
@@ -100,6 +118,28 @@ class BufferLine : IBufferLine {
         return buffer.toString()
     }
 
+    override fun insertChar(startPosition: Int, count: Int, characterToInsert: Char) {
+        for (index in startPosition until (startPosition + count).coerceAtMost(length)) {
+            cells[index] = CellData(cells[index], characterToInsert)
+        }
+    }
 
+    override fun shift(position: Direction, count: Int) {
+        when (position) {
+            Direction.LEFT -> {
+                for (index in cells.indices) {
+                    cells[index] = cells[(index + count).coerceAtMost(cells.size)]
+                }
+            }
+
+            Direction.RIGHT -> {
+                for (index in cells.size downTo 0) {
+                    cells[index] = cells[(index - count).coerceAtMost(0)]
+                }
+            }
+
+            else -> {}
+        }
+    }
 }
 
