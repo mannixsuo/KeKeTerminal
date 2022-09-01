@@ -1,4 +1,6 @@
-package terminal
+package parser
+
+import terminal.TerminalInputHandler
 
 data class CsiCommand(val finalChar: Char, val prefix: Char?, val intermediate: Char?)
 

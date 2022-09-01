@@ -47,7 +47,7 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
     fun start() {
         startReadFromChannel()
         startWriteToChannel()
-        bufferService.addLine(currentLine)
+        bufferService.getActiveBuffer().addLine(currentLine)
     }
 
     fun stop() {

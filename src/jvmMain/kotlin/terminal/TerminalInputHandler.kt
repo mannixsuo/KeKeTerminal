@@ -1,5 +1,6 @@
 package terminal
 
+import buffer.BufferLine
 import parser.Direction
 
 class TerminalInputHandler(private val terminal: Terminal) {
@@ -246,5 +247,15 @@ class TerminalInputHandler(private val terminal: Terminal) {
      */
     fun deleteCharacters(params: Array<Int>) {
         TODO("Not yet implemented")
+    }
+
+    fun carriageReturn() {
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            x = 0
+            scrollX = 0
+            y++
+            addLine(BufferLine())
+        }
     }
 }
