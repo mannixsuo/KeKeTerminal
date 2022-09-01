@@ -84,6 +84,7 @@ interface IBufferLine {
     fun putCell(cell: ICellData)
     fun insertChar(startPosition: Int, count: Int, characterToInsert: Char)
     fun shift(position: Direction, count: Int)
+    fun eraseLine(start: Int, end: Int)
 
 }
 
@@ -139,6 +140,12 @@ class BufferLine : IBufferLine {
             }
 
             else -> {}
+        }
+    }
+
+    override fun eraseLine(start: Int, end: Int) {
+        for (index in start..end.coerceAtMost(length)) {
+            cells[index] = defaultCellData
         }
     }
 }

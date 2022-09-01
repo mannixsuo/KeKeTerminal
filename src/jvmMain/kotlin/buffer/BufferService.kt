@@ -2,9 +2,13 @@ package buffer
 
 import parser.Direction
 import terminal.TerminalConfig
-import java.lang.RuntimeException
 
 interface IBuffer {
+
+    var screenColumns: Int
+
+    var screenRows: Int
+
     /**
      * scroll y position
      */
@@ -40,7 +44,9 @@ interface IBuffer {
      * insert line at index, elements before index is move backward , if buffer is full first element is removed for space
      */
     fun insertLine(index: Int, line: IBufferLine)
+
     fun moveCursor(direction: Direction, count: Int)
+
 
 }
 
@@ -48,6 +54,10 @@ interface IBuffer {
 class Buffer : IBuffer {
 
     private val buffer = CircularList<IBufferLine>(1024)
+
+    override var screenColumns = 120
+
+    override var screenRows = 30
 
     /**
      * scroll y position
@@ -98,8 +108,14 @@ class Buffer : IBuffer {
             Direction.RIGHT -> {
                 x += count
             }
+
+            Direction.ABSOLUTE -> {
+                x = count
+            }
         }
     }
+
+
 }
 
 

@@ -88,7 +88,10 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Cursor Next Line Ps Times (default = 1) (CNL).
      */
     fun cursorNextLine(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            moveCursor(Direction.DOWN, params.elementAtOrElse(0) { 1 })
+        }
     }
 
     /**
@@ -96,15 +99,22 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Cursor Preceding Line Ps Times (default = 1) (CPL).
      */
     fun cursorPrecedingLine(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            moveCursor(Direction.UP, params.elementAtOrElse(0) { 1 })
+        }
     }
 
     /**
      * CSI Ps G
      * Cursor Character Absolute  [column] (default = [row,1]) (CHA).
+     * Moves cursor to the Ps-th column of the active line. The default value of Ps is 1.
      */
     fun cursorCharacterAbsolute(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            x = params.elementAtOrElse(0) { 1 }
+        }
     }
 
     /**
@@ -112,7 +122,11 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Cursor Position [row;column] (default = [1,1]) (CUP).
      */
     fun cursorPosition(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            y = params.elementAtOrElse(0) { 1 }
+            x = params.elementAtOrElse(1) { 1 }
+        }
     }
 
     /**
@@ -120,7 +134,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Cursor Forward Tabulation Ps tab stops (default = 1) (CHT).
      */
     fun cursorForwardTabulation(params: Array<Int>) {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     /**
@@ -131,7 +145,34 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Ps = 3  ⇒  Erase Saved Lines, xterm.
      */
     fun eraseInDisplay(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            when (params.elementAtOrElse(0) { 0 }) {
+                0 -> {
+                    for (index in (y + 1)..screenRows) {
+                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                    }
+                }
+
+                1 -> {
+                    for (index in (y - 1) downTo 0) {
+                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                    }
+                }
+
+                2 -> {
+                    for (index in 0..y) {
+                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                    }
+                }
+                //Ps = 3  ⇒  Erase Saved Lines, xterm.
+                3 -> {
+                    for (index in 0..scrollY + y) {
+                        getLine(index).eraseLine(0, Int.MAX_VALUE)
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -143,7 +184,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Ps = 3  ⇒  Selective Erase Saved Lines, xterm.
      */
     fun eraseInDisplaySelective(params: Array<Int>) {
-        TODO("Not yet implemented")
+        eraseInDisplay(params)
     }
 
     /**
@@ -153,7 +194,23 @@ class TerminalInputHandler(private val terminal: Terminal) {
      *  Ps = 2  ⇒  Erase All.
      */
     fun eraseInLine(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            when (params.elementAtOrElse(0) { 0 }) {
+                0 -> {
+                    getLine(scrollY + y).eraseLine(scrollX + x, Int.MAX_VALUE)
+                }
+
+                1 -> {
+                    getLine(scrollY + y).eraseLine(0, scrollX + x)
+                }
+
+                2 -> {
+                    getLine(scrollY + y).eraseLine(0, Int.MAX_VALUE)
+                }
+            }
+
+        }
     }
 
     /**
@@ -164,7 +221,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
      * Ps = 2  ⇒  Selective Erase All.
      */
     fun eraseInLineSelective(params: Array<Int>) {
-        TODO("Not yet implemented")
+        eraseInLine(params)
     }
 
     /**
