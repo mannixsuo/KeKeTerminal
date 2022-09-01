@@ -3,6 +3,8 @@ package parser
 import character.TransitionTable
 import org.slf4j.LoggerFactory
 import terminal.Terminal
+import terminal.TerminalInputHandler
+import java.util.*
 
 class Parser(private val terminal: Terminal) {
 
@@ -11,11 +13,14 @@ class Parser(private val terminal: Terminal) {
     var currentState = ParserState.GROUND
     var currentAction = ParserAction.PRINT
     private var params = Params()
-    private var collect: Char = Char(0)
+    private var collect = Stack<Char>()
     private val transitionTable = TransitionTable(4096)
     private val c0c1ControlFunctionExecutors: Map<Int, Executor> = HashMap()
     private val oscHandler = OSCHandler()
     private var dcsHandler = DCSHandler()
+    private val terminalInputHandler = TerminalInputHandler(terminal)
+    private val csiHandler = CsiHandler(terminalInputHandler)
+    private val singleCharacterFunHandler = SingleCharacterFunHandler(terminalInputHandler)
 
     init {
         initTransitionTable()
@@ -315,7 +320,7 @@ class Parser(private val terminal: Terminal) {
 
             ParserAction.CLEAR -> {
                 params.reset()
-                collect = Char(0)
+                collect.clear()
             }
 
             ParserAction.OSC_START -> {
@@ -331,7 +336,7 @@ class Parser(private val terminal: Terminal) {
             }
 
             ParserAction.CSI_DISPATCH -> {
-                csiDispatch(collect, params, code).execute(terminal)
+                csiHandler.csiDispatch(collect, params, code)
             }
 
             ParserAction.PARAM -> {
@@ -339,15 +344,15 @@ class Parser(private val terminal: Terminal) {
             }
 
             ParserAction.COLLECT -> {
-                collect = code.toChar()
+                collect.push(code.toChar())
             }
 
             ParserAction.ESC_DISPATCH -> {
-                escDispatch(collect, code).execute(terminal)
+                TODO()
             }
 
             ParserAction.DCS_HOOK -> {
-                dcsHandler = dcsHook(collect, params, code)
+                TODO()
             }
 
             ParserAction.DCS_PUT -> {
@@ -362,29 +367,12 @@ class Parser(private val terminal: Terminal) {
         currentAction = nextAction
     }
 
-    private fun dcsHook(collect: Char, params: Params, code: Int): DCSHandler {
+    private fun dcsHook(collect: Array<Char>, params: Params, code: Int): DCSHandler {
         TODO("Not yet implemented")
     }
 
-    private fun escDispatch(collect: Char, code: Int): Executor {
+    private fun escDispatch(collect: Array<Char>, code: Int): Executor {
         TODO("Not yet implemented")
     }
 
-    private fun csiDispatch(collect: Char, params: Params, code: Int): Executor {
-        return when (code.toChar()) {
-            '@' -> {
-                object : Executor {
-                    override fun execute(terminal: Terminal) {
-                    }
-                }
-            }
-
-            else -> {
-                object : Executor {
-                    override fun execute(terminal: Terminal) {
-                    }
-                }
-            }
-        }
-    }
 }

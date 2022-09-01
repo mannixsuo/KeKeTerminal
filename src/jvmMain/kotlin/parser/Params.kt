@@ -2,7 +2,7 @@ package parser
 
 class Params {
 
-    private var params: Array<String> = Array(10) { "0" }
+    private var params: Array<Int> = Array(10) { 0 }
     private var length: Int = 0
     private var buffer = StringBuffer()
 
@@ -13,9 +13,9 @@ class Params {
 
     fun put(code: Int) {
         if (code == 0x3b) {
-            params[length] = buffer.toString()
+            params[length] = buffer.toString().toInt()
             length++
-            buffer = StringBuffer()
+            buffer = buffer.delete(0, buffer.length)
         } else {
             buffer.append(code.toChar())
         }
@@ -26,5 +26,9 @@ class Params {
             return 0
         }
         return params[index].toInt()
+    }
+
+    fun toIntArray(): Array<Int> {
+        return params
     }
 }

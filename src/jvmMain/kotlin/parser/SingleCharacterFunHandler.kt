@@ -2,9 +2,9 @@ package parser
 
 import terminal.TerminalInputHandler
 
-class SingleCharacterFunHandler {
+class SingleCharacterFunHandler(private val terminalInputHandler: TerminalInputHandler) {
+
     private val commandExecutorMap = HashMap<Int, SingleCharacterFun>()
-    private lateinit var terminalInputHandler: TerminalInputHandler
 
     init {
         commandExecutorMap[13] = { terminalInputHandler.carriageReturn() }

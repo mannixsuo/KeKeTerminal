@@ -1,14 +1,36 @@
 package parser
 
 import terminal.TerminalInputHandler
+import java.util.Stack
 
 data class CsiCommand(val finalChar: Char, val prefix: Char?, val intermediate: Char?)
 
-class CsiHandler {
+class CsiHandler(private val terminalInputHandler: TerminalInputHandler) {
+
+    // TODO
+    // | finalChar | intermediate | prefix
+    // CSI Ps * x ------- | x | * | 0 |
+    // CSI Ps SP t ------ | t | SP| 0 |
+    // CSI ? Ps $ p ----- | p | $ | ? |
+    fun csiDispatch(collect: Stack<Char>, params: Params, finalCharCode: Int) {
+        var prefix: Char? = null
+        var intermediate: Char? = null
+
+        if (collect.size == 2) {
+            intermediate = collect.pop()
+            prefix = collect.pop()
+        } else {
+
+        }
+        for (command in commandExecutorMap) {
+            val key = command.key
+            if (key.finalChar == finalCharCode.toChar()) {
+                command.value.invoke(params.toIntArray())
+            }
+        }
+    }
 
     private val commandExecutorMap = HashMap<CsiCommand, CsiHandlerFun>()
-
-    private lateinit var terminalInputHandler: TerminalInputHandler
 
     init {
         with(commandExecutorMap) {
