@@ -300,6 +300,7 @@ class Parser(private val terminal: Terminal) {
     private fun onChar(code: Int) {
         val (nextAction, nextState) = transitionTable.queryTable(code, currentState)
         if (logger.isDebugEnabled) {
+            logger.debug("ON CHAR [${code.toChar()}]")
             logger.debug("[ $currentState, $code ] -> [ $nextState, $nextAction ]")
         }
         when (nextAction) {
@@ -314,7 +315,7 @@ class Parser(private val terminal: Terminal) {
                 if (executor != null) {
                     executor.execute(terminal)
                 } else {
-                    print("no executor found for $code")
+                    print("NO C0C1CONTROLFUNCTIONEXECUTOR FOUND FOR $code")
                 }
             }
 

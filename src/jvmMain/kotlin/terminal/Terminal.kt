@@ -4,12 +4,14 @@ import buffer.BufferLine
 import buffer.BufferService
 import buffer.CellData
 import buffer.IBufferService
+import org.slf4j.LoggerFactory
 import parser.Parser
 import shell.Shell
 import java.io.IOException
 import java.io.InputStreamReader
 
 class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
+    private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService(terminalConfig)
 
     /**
@@ -37,11 +39,22 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
 
 
     fun printChar(charCode: Int) {
-        currentLine.putCell(
-            CellData(
-                Char(charCode), nextCharFgColor, nextCharBgColor, nextCharBold, nextCharItalic
-            )
-        )
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            val line = getLine(scrollY + y)
+            if (line == null) {
+                logger.error("line not found ${scrollY + y}")
+            } else {
+                line.putCell(
+                    scrollX + x,
+                    CellData(
+                        Char(charCode), nextCharFgColor, nextCharBgColor, nextCharBold, nextCharItalic
+                    )
+                )
+                x++
+            }
+
+        }
     }
 
     fun start() {

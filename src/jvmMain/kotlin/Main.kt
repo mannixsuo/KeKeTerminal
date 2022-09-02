@@ -40,8 +40,8 @@ fun main() = application {
     val terminal = Terminal(localShell, terminalConfig)
     terminal.start()
     Window(onCloseRequest = {
-        exitApplication()
         terminal.stop()
+        exitApplication()
     }) {
         App()
     }

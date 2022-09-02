@@ -81,7 +81,7 @@ interface IBufferLine {
 
     fun get(index: Int): ICellData
     fun putChar(char: Char)
-    fun putCell(cell: ICellData)
+    fun putCell(index: Int, cell: ICellData)
     fun insertChar(startPosition: Int, count: Int, characterToInsert: Char)
     fun shift(position: Direction, count: Int)
     fun eraseLine(start: Int, end: Int)
@@ -93,7 +93,7 @@ val defaultCellData = CellData(
 )
 
 class BufferLine : IBufferLine {
-    private var cells: Array<ICellData> = Array(100) { defaultCellData }
+    private var cells: Array<ICellData> = Array(120) { defaultCellData }
 
     override var length: Int = 0
 
@@ -107,8 +107,9 @@ class BufferLine : IBufferLine {
         TODO("Not yet implemented")
     }
 
-    override fun putCell(cell: ICellData) {
-        cells[length++] = cell
+    override fun putCell(index: Int, cell: ICellData) {
+        cells[index] = cell
+        length++
     }
 
     override fun toString(): String {

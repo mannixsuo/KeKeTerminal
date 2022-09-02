@@ -2,6 +2,7 @@ package buffer
 
 import parser.Direction
 import terminal.TerminalConfig
+import java.util.*
 
 interface IBuffer {
 
@@ -33,7 +34,7 @@ interface IBuffer {
      * get line at index,
      * index is absolute position in buffer. we don't have to include scroll position
      */
-    fun getLine(index: Int): IBufferLine
+    fun getLine(index: Int): IBufferLine?
 
     /**
      * push one line into buffer
@@ -53,7 +54,13 @@ interface IBuffer {
 
 class Buffer : IBuffer {
 
-    private val buffer = CircularList<IBufferLine>(1024)
+    private val buffer = LinkedList<IBufferLine>()
+
+    init {
+        for (index in 0..30) {
+            buffer.push(BufferLine())
+        }
+    }
 
     override var screenColumns = 120
 
@@ -79,8 +86,12 @@ class Buffer : IBuffer {
      */
     override var x: Int = 0
 
-    override fun getLine(index: Int): IBufferLine {
-        return buffer.get(index) ?: throw RuntimeException("can't get line at $index, total size is ${buffer.length}")
+    override fun getLine(index: Int): IBufferLine? {
+        return if (buffer.size > index) {
+            buffer[index]
+        } else {
+            null
+        }
     }
 
     override fun addLine(line: BufferLine) {
