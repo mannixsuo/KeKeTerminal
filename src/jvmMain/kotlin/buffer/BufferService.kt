@@ -48,17 +48,19 @@ interface IBuffer {
 
     fun moveCursor(direction: Direction, count: Int)
 
+    fun getLine(from: Int, to: Int): List<IBufferLine>
+
 
 }
 
 
 class Buffer : IBuffer {
 
-    private val buffer = LinkedList<IBufferLine>()
+    private val buffer = Collections.synchronizedList(LinkedList<IBufferLine>())
 
     init {
         for (index in 0..30) {
-            buffer.push(BufferLine())
+            buffer.add(BufferLine())
         }
     }
 
@@ -95,7 +97,7 @@ class Buffer : IBuffer {
     }
 
     override fun addLine(line: BufferLine) {
-        buffer.push(line)
+        buffer.add(line)
     }
 
     override fun insertLine(index: Int, line: IBufferLine) {
@@ -126,7 +128,9 @@ class Buffer : IBuffer {
         }
     }
 
-
+    override fun getLine(from: Int, to: Int): List<IBufferLine> {
+        return buffer.subList(from, to)
+    }
 }
 
 

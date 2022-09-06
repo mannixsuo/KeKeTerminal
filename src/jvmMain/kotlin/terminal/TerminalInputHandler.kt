@@ -14,7 +14,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun insertChars(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y).insertChar(scrollX + x, params.elementAtOrElse(0) { 1 }, ' ')
+            getLine(scrollY + y)?.insertChar(scrollX + x, params.elementAtOrElse(0) { 1 }, ' ')
         }
     }
 
@@ -25,7 +25,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun shiftLeft(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y).shift(Direction.LEFT, params.elementAtOrElse(0) { 1 })
+            getLine(scrollY + y)?.shift(Direction.LEFT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -47,7 +47,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorRight(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y).shift(Direction.RIGHT, params.elementAtOrElse(0) { 1 })
+            getLine(scrollY + y)?.shift(Direction.RIGHT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -151,25 +151,25 @@ class TerminalInputHandler(private val terminal: Terminal) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
                     for (index in (y + 1)..screenRows) {
-                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
                     }
                 }
 
                 1 -> {
                     for (index in (y - 1) downTo 0) {
-                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
                     }
                 }
 
                 2 -> {
                     for (index in 0..y) {
-                        getLine(scrollY + index).eraseLine(0, Int.MAX_VALUE)
+                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
                     }
                 }
                 //Ps = 3  ⇒  Erase Saved Lines, xterm.
                 3 -> {
                     for (index in 0..scrollY + y) {
-                        getLine(index).eraseLine(0, Int.MAX_VALUE)
+                        getLine(index)?.eraseLine(0, Int.MAX_VALUE)
                     }
                 }
             }
@@ -199,16 +199,18 @@ class TerminalInputHandler(private val terminal: Terminal) {
         with(activeBuffer) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
-                    getLine(scrollY + y).eraseLine(scrollX + x, Int.MAX_VALUE)
+                    getLine(scrollY + y)?.eraseLine(scrollX + x, Int.MAX_VALUE)
                 }
 
                 1 -> {
-                    getLine(scrollY + y).eraseLine(0, scrollX + x)
+                    getLine(scrollY + y)?.eraseLine(0, scrollX + x)
                 }
 
                 2 -> {
-                    getLine(scrollY + y).eraseLine(0, Int.MAX_VALUE)
+                    getLine(scrollY + y)?.eraseLine(0, Int.MAX_VALUE)
                 }
+
+                else -> {}
             }
 
         }

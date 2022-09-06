@@ -11,6 +11,8 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
+    var repaint: Boolean = true
+
     private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService(terminalConfig)
 

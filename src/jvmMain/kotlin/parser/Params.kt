@@ -7,17 +7,15 @@ class Params {
     private var buffer = StringBuffer()
 
     fun reset() {
-        this.params = emptyArray()
+        this.params = Array(10) { 0 }
         this.length = 0
     }
 
     fun put(code: Int) {
         if (code == 0x3b) {
-            params[length] = buffer.toString().toInt()
             length++
-            buffer = buffer.delete(0, buffer.length)
         } else {
-            buffer.append(code.toChar())
+            params[length] = (params[length] * 10) + (code - 0x30)
         }
     }
 
@@ -25,10 +23,24 @@ class Params {
         if (index > length) {
             return 0
         }
-        return params[index].toInt()
+        return params[index]
     }
 
     fun toIntArray(): Array<Int> {
-        return params
+        return params.sliceArray(IntRange(0, length))
+    }
+
+    fun toParamString(): String {
+        val s = StringBuilder()
+        var index = 0
+        params.sliceArray(IntRange(0, length)).forEach {
+            s.append(it)
+            if (index != length) {
+                s.append(";")
+            }
+            index++
+        }
+
+        return s.toString()
     }
 }

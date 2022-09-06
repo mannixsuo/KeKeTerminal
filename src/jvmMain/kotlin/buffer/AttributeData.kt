@@ -85,6 +85,7 @@ interface IBufferLine {
     fun insertChar(startPosition: Int, count: Int, characterToInsert: Char)
     fun shift(position: Direction, count: Int)
     fun eraseLine(start: Int, end: Int)
+    fun toLineString(): String?
 
 }
 
@@ -118,6 +119,14 @@ class BufferLine : IBufferLine {
             buffer.append(cell.getChar())
         }
         return buffer.toString()
+    }
+
+    override fun toLineString(): String? {
+        return if (length > 0) {
+            toString()
+        } else {
+            null
+        }
     }
 
     override fun insertChar(startPosition: Int, count: Int, characterToInsert: Char) {

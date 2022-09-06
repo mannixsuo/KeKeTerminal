@@ -54,7 +54,7 @@ class CsiHandler(private val terminalInputHandler: TerminalInputHandler) {
         if (commandExecutorMap.containsKey(key)) {
             commandExecutorMap[key]?.invoke(params.toIntArray())
         } else {
-            logger.warn("NO CSI COMMAND HANDLER FOUND FOR $prefix $intermediate ${finalCharCode.toChar()}")
+            logger.warn("NO CSI COMMAND HANDLER FOUND FOR CSI ${prefix ?: ""} ${params.toParamString()}  ${intermediate ?: ""} ${finalCharCode.toChar()}")
         }
 
     }

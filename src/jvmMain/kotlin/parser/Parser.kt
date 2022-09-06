@@ -15,7 +15,6 @@ class Parser(private val terminal: Terminal) {
     private var params = Params()
     private var collect = Stack<Char>()
     private val transitionTable = TransitionTable(4096)
-    private val c0c1ControlFunctionExecutors: Map<Int, Executor> = HashMap()
     private val oscHandler = OSCHandler()
     private var dcsHandler = DCSHandler()
     private val terminalInputHandler = TerminalInputHandler(terminal)
@@ -311,12 +310,7 @@ class Parser(private val terminal: Terminal) {
             }
 
             ParserAction.EXECUTE -> {
-                val executor = c0c1ControlFunctionExecutors[code]
-                if (executor != null) {
-                    executor.execute(terminal)
-                } else {
-                    print("NO C0C1CONTROLFUNCTIONEXECUTOR FOUND FOR $code")
-                }
+                singleCharacterFunHandler.handleCode(code)
             }
 
             ParserAction.CLEAR -> {

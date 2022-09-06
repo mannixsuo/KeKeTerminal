@@ -14,18 +14,19 @@ import shell.LocalPty
 import shell.Shell
 import terminal.Terminal
 import terminal.TerminalConfig
+import ui.TerminalView
 
 @Composable
 @Preview
-fun App() {
+fun App(terminal: Terminal) {
     var text by remember { mutableStateOf("Hello, World!") }
-
     MaterialTheme {
         Button(onClick = {
             text = "Hello, Desktop!"
         }) {
             Text(text)
         }
+        TerminalView(terminal)
     }
 }
 
@@ -43,7 +44,7 @@ fun main() = application {
         terminal.stop()
         exitApplication()
     }) {
-        App()
+        App(terminal)
     }
     val parentLogger = LoggerFactory.getLogger("kotlin") as Logger
     parentLogger.level = Level.DEBUG
