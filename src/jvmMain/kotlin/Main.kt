@@ -1,9 +1,7 @@
 // Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ch.qos.logback.classic.Level
@@ -18,33 +16,29 @@ import ui.TerminalView
 
 @Composable
 @Preview
-fun App(terminal: Terminal) {
-    var text by remember { mutableStateOf("Hello, World!") }
+fun App() {
     MaterialTheme {
-        Button(onClick = {
-            text = "Hello, Desktop!"
-        }) {
-            Text(text)
-        }
         TerminalView(terminal)
     }
 }
 
+val terminalConfig = TerminalConfig()
+val localShell: Shell = LocalPty(
+    PtyProcessBuilder(arrayOf("cmd.exe"))
+        .setInitialColumns(terminalConfig.columns)
+        .setInitialRows(terminalConfig.rows)
+        .start()
+)
+val terminal = Terminal(localShell, terminalConfig)
+
 fun main() = application {
-    val terminalConfig = TerminalConfig()
-    val localShell: Shell = LocalPty(
-        PtyProcessBuilder(arrayOf("cmd.exe"))
-            .setInitialColumns(terminalConfig.columns)
-            .setInitialRows(terminalConfig.rows)
-            .start()
-    )
-    val terminal = Terminal(localShell, terminalConfig)
     terminal.start()
+
     Window(onCloseRequest = {
         terminal.stop()
         exitApplication()
-    }) {
-        App(terminal)
+    }, title = "CoCoTerminal") {
+        App()
     }
     val parentLogger = LoggerFactory.getLogger("kotlin") as Logger
     parentLogger.level = Level.DEBUG

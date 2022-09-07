@@ -1,57 +1,43 @@
 package ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import buffer.IBufferLine
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import terminal.Terminal
+import ui.Fonts.jetbrainsMono
 
 @Composable
 fun TerminalView(terminal: Terminal) {
 
-    var lines: List<IBufferLine> = terminal.bufferService.getActiveBuffer().getLine(0, 30)
+    var lines: List<IBufferLine> by remember { mutableStateOf(ArrayList<IBufferLine>()) }
+
+    var coursorX by remember { mutableStateOf(0) }
+
+    var coursorY by remember { mutableStateOf(0) }
 
     Surface {
-        Lines(readLines(terminal))
-    }
-}
-
-fun readLines(terminal: Terminal): (backgroundScope: CoroutineScope) -> List<IBufferLine> {
-    return fun(scope: CoroutineScope): List<IBufferLine> {
-        var list: List<IBufferLine> by mutableStateOf(ArrayList())
-
-        val refreshJob = scope.launch {
-            while (true) {
-                delay(1000)
-                if (terminal.repaint) {
-                    list = terminal.bufferService.getActiveBuffer().getLine(0, 30)
-                }
-            }
+        if (terminal.repaint.value) {
+            val activeBuffer = terminal.bufferService.getActiveBuffer()
+            lines = activeBuffer.getLine(0, 30)
+            coursorX = activeBuffer.x
+            coursorY = activeBuffer.y
+            terminal.repaint.value = false
         }
-        return list
+        Column {
+            Text("cursor ($coursorX,$coursorY)")
+            Lines(lines)
+        }
     }
 }
 
 @Composable
-fun Lines(linesCoroutine: (backgroundScope: CoroutineScope) -> List<IBufferLine>) {
-    val scrollState = rememberLazyListState()
-    val lines by loadableScoped(linesCoroutine)
-
-
-    LazyColumn(state = scrollState) {
-        if (lines != null) {
-            items(lines!!.size) {
-                Line(lines!![it])
-            }
+fun Lines(lines: List<IBufferLine>) {
+    Column {
+        for (line in lines) {
+            Line(line)
         }
     }
 }
@@ -64,4 +50,10 @@ fun Line(line: IBufferLine) {
 }
 
 @Composable
-fun LineContent(line: IBufferLine) = Text(line.toLineString() ?: "")
+fun LineContent(line: IBufferLine) {
+    line.getCells()?.let {
+        for (cell in it) {
+            Text(text = cell.getChar().toString(), softWrap = false, fontFamily = jetbrainsMono())
+        }
+    }
+}

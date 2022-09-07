@@ -1,5 +1,6 @@
 package parser
 
+import character.NON_ASCII_PRINTABLE
 import character.TransitionTable
 import org.slf4j.LoggerFactory
 import terminal.Terminal
@@ -281,6 +282,12 @@ class Parser(private val terminal: Terminal) {
             // 40-7E
             addRange(0x40, 0x7e, ParserState.DCS_PARAM, ParserAction.DCS_HOOK, ParserState.DCS_PASS_THROUGH)
 
+            // unicode character
+            add(NON_ASCII_PRINTABLE, ParserState.GROUND, ParserAction.PRINT, ParserState.GROUND)
+            add(NON_ASCII_PRINTABLE, ParserState.OSC_STRING, ParserAction.OSC_PUT, ParserState.OSC_STRING)
+            add(NON_ASCII_PRINTABLE, ParserState.CSI_IGNORE, ParserAction.IGNORE, ParserState.CSI_IGNORE)
+            add(NON_ASCII_PRINTABLE, ParserState.DCS_IGNORE, ParserAction.IGNORE, ParserState.DCS_IGNORE)
+            add(NON_ASCII_PRINTABLE, ParserState.DCS_PASS_THROUGH, ParserAction.DCS_PUT, ParserState.DCS_PASS_THROUGH)
         }
     }
 

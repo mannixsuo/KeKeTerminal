@@ -1,5 +1,7 @@
 package terminal
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import buffer.BufferLine
 import buffer.BufferService
 import buffer.CellData
@@ -11,7 +13,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
-    var repaint: Boolean = true
+    var repaint: MutableState<Boolean> = mutableStateOf(true)
 
     private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService(terminalConfig)
@@ -55,7 +57,7 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
                 )
                 x++
             }
-
+            repaint.value = true
         }
     }
 

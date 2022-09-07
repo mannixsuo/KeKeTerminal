@@ -86,6 +86,7 @@ interface IBufferLine {
     fun shift(position: Direction, count: Int)
     fun eraseLine(start: Int, end: Int)
     fun toLineString(): String?
+    fun getCells(): Array<ICellData>?
 
 }
 
@@ -157,6 +158,13 @@ class BufferLine : IBufferLine {
         for (index in start..end.coerceAtMost(length)) {
             cells[index] = defaultCellData
         }
+    }
+
+    override fun getCells(): Array<ICellData>? {
+        if (length==0){
+            return null
+        }
+        return cells.copyOfRange(0, length)
     }
 }
 

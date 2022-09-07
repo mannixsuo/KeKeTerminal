@@ -3,6 +3,7 @@ package buffer
 import parser.Direction
 import terminal.TerminalConfig
 import java.util.*
+import java.util.concurrent.locks.ReentrantLock
 
 interface IBuffer {
 
@@ -58,6 +59,8 @@ class Buffer : IBuffer {
 
     private val buffer = Collections.synchronizedList(LinkedList<IBufferLine>())
 
+    private val lock = ReentrantLock()
+
     init {
         for (index in 0..30) {
             buffer.add(BufferLine())
@@ -89,15 +92,26 @@ class Buffer : IBuffer {
     override var x: Int = 0
 
     override fun getLine(index: Int): IBufferLine? {
-        return if (buffer.size > index) {
-            buffer[index]
-        } else {
-            null
+        try {
+            lock.lock()
+            return if (buffer.size > index) {
+                buffer[index]
+            } else {
+                null
+            }
+        } finally {
+            lock.unlock()
         }
+
     }
 
     override fun addLine(line: BufferLine) {
-        buffer.add(line)
+        try {
+            lock.lock()
+            buffer.add(line)
+        } finally {
+            lock.unlock()
+        }
     }
 
     override fun insertLine(index: Int, line: IBufferLine) {
@@ -129,7 +143,12 @@ class Buffer : IBuffer {
     }
 
     override fun getLine(from: Int, to: Int): List<IBufferLine> {
-        return buffer.subList(from, to)
+        try {
+            lock.lock()
+            return buffer.slice(IntRange(from, to))
+        } finally {
+            lock.unlock()
+        }
     }
 }
 
