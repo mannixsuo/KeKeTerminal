@@ -48,7 +48,7 @@ class TransitionTable(private val size: Int) {
 
     fun queryTable(code: Int, currentState: ParserState): Pair<ParserAction, ParserState> {
         if (logger.isDebugEnabled) {
-            logger.debug("queryTable [code:$code, codeChar:${code.toChar()}, currentState:$currentState]")
+            logger.debug("queryTable [ code: $code, currentState: $currentState ]")
         }
         val value = table[currentState.state shl INDEX_STATE_SHIFT or (if (code < 0xA0) code else NON_ASCII_PRINTABLE)]
         val action: ParserAction = ParserAction.of(value shr TRANSITION_ACTION_SHIFT)

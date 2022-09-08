@@ -257,7 +257,16 @@ class TerminalInputHandler(private val terminal: Terminal) {
             x = 0
             scrollX = 0
             y++
-            addLine(BufferLine())
         }
+        terminal.repaint.value = true
+
+    }
+
+    fun newLine() {
+        val activeBuffer = bufferService.getActiveBuffer()
+        with(activeBuffer) {
+            setLine(scrollY + y, BufferLine(1))
+        }
+        terminal.repaint.value = true
     }
 }

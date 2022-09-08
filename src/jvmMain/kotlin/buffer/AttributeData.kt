@@ -101,6 +101,13 @@ class BufferLine : IBufferLine {
 
     override var isWrapped: Boolean = false
 
+    constructor()
+
+    constructor(length: Int) {
+        this.length = length
+    }
+
+
     override fun get(index: Int): ICellData {
         return cells[index]
     }
@@ -161,7 +168,7 @@ class BufferLine : IBufferLine {
     }
 
     override fun getCells(): Array<ICellData>? {
-        if (length==0){
+        if (length == 0) {
             return null
         }
         return cells.copyOfRange(0, length)

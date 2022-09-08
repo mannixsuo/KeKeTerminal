@@ -9,6 +9,7 @@ class SingleCharacterFunHandler(private val terminalInputHandler: TerminalInputH
 
     init {
         commandExecutorMap[13] = { terminalInputHandler.carriageReturn() }
+        commandExecutorMap[10] = { terminalInputHandler.newLine() }
     }
 
     fun handleCode(code: Int) {

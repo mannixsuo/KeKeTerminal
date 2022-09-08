@@ -51,6 +51,7 @@ interface IBuffer {
 
     fun getLine(from: Int, to: Int): List<IBufferLine>
 
+    fun setLine(index: Int, line: IBufferLine)
 
 }
 
@@ -146,6 +147,15 @@ class Buffer : IBuffer {
         try {
             lock.lock()
             return buffer.slice(IntRange(from, to))
+        } finally {
+            lock.unlock()
+        }
+    }
+
+    override fun setLine(index: Int, line: IBufferLine) {
+        try {
+            lock.lock()
+            buffer[index] = line
         } finally {
             lock.unlock()
         }

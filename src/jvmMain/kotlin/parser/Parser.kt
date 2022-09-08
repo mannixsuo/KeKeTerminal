@@ -5,11 +5,14 @@ import character.TransitionTable
 import org.slf4j.LoggerFactory
 import terminal.Terminal
 import terminal.TerminalInputHandler
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 class Parser(private val terminal: Terminal) {
 
     private val logger = LoggerFactory.getLogger(Parser::class.java)
+
 
     var currentState = ParserState.GROUND
     var currentAction = ParserAction.PRINT
@@ -306,8 +309,10 @@ class Parser(private val terminal: Terminal) {
     private fun onChar(code: Int) {
         val (nextAction, nextState) = transitionTable.queryTable(code, currentState)
         if (logger.isDebugEnabled) {
-            logger.debug("ON CHAR [${code.toChar()}]")
-            logger.debug("[ $currentState, $code ] -> [ $nextState, $nextAction ]")
+            logger.debug("ON CHAR [${if (code.toChar().isISOControl())code else code.toChar()}]")
+            logger.debug(
+                "CURRENT: [ {}, {} ] -> NEXT: [ {}, {} ]", currentState, code, nextState, nextAction
+            )
         }
         when (nextAction) {
             ParserAction.IGNORE, ParserAction.ERROR -> {}
