@@ -146,7 +146,7 @@ class Buffer : IBuffer {
     override fun getLine(from: Int, to: Int): List<IBufferLine> {
         try {
             lock.lock()
-            return buffer.slice(IntRange(from, to))
+            return buffer.slice(IntRange(from, to.coerceAtMost(buffer.size) - 1))
         } finally {
             lock.unlock()
         }

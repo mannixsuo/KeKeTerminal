@@ -1,98 +1,85 @@
 package ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import buffer.IBufferLine
-import kotlinx.coroutines.launch
 import terminal.Terminal
-import ui.Fonts.jetbrainsMono
 import java.util.*
 
 data class CursorState(var x: Int = 0, var y: Int = 0, var blink: Boolean = false)
-
+data class ScrollState(var x: Int = 0, var y: Int = 0)
 
 @Composable
 fun TerminalView(terminal: Terminal) {
 
     var lines: List<IBufferLine> by remember { mutableStateOf(ArrayList<IBufferLine>()) }
-    val repaintTimer: Timer? by remember { mutableStateOf(null) }
-
+    var timerInitialed by remember { mutableStateOf(false) }
     val cursorState by remember { mutableStateOf(CursorState()) }
-    val coroutineScope = rememberCoroutineScope()
+    var cursorBlink by remember { mutableStateOf(false) }
+    var cursorX by remember { mutableStateOf(0) }
+    var cursorY by remember { mutableStateOf(0) }
 
-    Surface {
-        coroutineScope.launch {
-//TODO
-            while (true) {
-                val maxFPS = 50
-                repaintTimer?.cancel()
-                repaintTimer?.schedule(object : TimerTask() {
-                    override fun run() {
-                        val activeBuffer = terminal.bufferService.getActiveBuffer()
-                        lines = activeBuffer.getLine(0, 30)
-                        cursorState.x = activeBuffer.x
-                        cursorState.y = activeBuffer.y
-                    }
-                }, 1000L / maxFPS)
+    val timer by remember { mutableStateOf(Timer()) }
+    if (!timerInitialed) {
+        timer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                cursorBlink = !cursorBlink
+                print(cursorBlink)
+                lines = terminal.bufferService.getActiveBuffer().getLine(0, 100)
+                cursorX = terminal.bufferService.getActiveBuffer().x
+                cursorY = terminal.bufferService.getActiveBuffer().y
 
             }
-        }
+        }, 1000, 500)
+        timerInitialed = true
+    }
 
+    Surface {
         Column {
-            Text("cursor (${cursorState.x},${cursorState.y})")
-            Lines(lines, cursorState)
+            Text("cursor (${cursorX},${cursorY})")
+            Lines(lines, cursorX, cursorY, cursorBlink)
         }
     }
 }
 
 @Composable
-fun Lines(lines: List<IBufferLine>, cursorState: CursorState) {
+fun Lines(lines: List<IBufferLine>, cursorX: Int, cursorY: Int, cursorBlink: Boolean) {
 
     Column {
         for (index in lines.indices) {
-            Line(lines[index], index == cursorState.y, cursorState)
+            Line(lines[index], index == cursorY, cursorBlink, cursorX)
         }
     }
 }
 
 @Composable
-fun Line(line: IBufferLine, cursorOnThisLine: Boolean, cursorState: CursorState) {
+fun Line(line: IBufferLine, cursorOnThisLine: Boolean, cursorBlink: Boolean, cursorX: Int) {
 
     Row {
-        LineContent(line, cursorOnThisLine, cursorState)
+        LineContent(line, cursorOnThisLine, cursorBlink, cursorX)
     }
 }
 
 @Composable
-fun LineContent(line: IBufferLine, cursorOnThisLine: Boolean, cursorState: CursorState) {
-    if (cursorOnThisLine) {
-        line.getCells()?.let {
-            for (index in it.indices) {
-                if (cursorState.x == index) {
-                    Text(
-                        modifier = Modifier.background(Color.Black),
-                        text = it[index].getChar().toString(),
-                        softWrap = false,
-                        color = Color.White,
-                        fontFamily = jetbrainsMono()
-                    )
-                } else {
-                    Text(text = it[index].getChar().toString(), softWrap = false, fontFamily = jetbrainsMono())
-                }
-            }
-        }
-    } else {
-        line.getCells()?.let {
-            for (index in it.indices) {
-                Text(text = it[index].getChar().toString(), softWrap = false, fontFamily = jetbrainsMono())
-            }
-        }
+fun LineContent(line: IBufferLine, cursorOnThisLine: Boolean, cursorBlink: Boolean, cursorX: Int) {
+
+    val builder = AnnotatedString
+        .Builder(line.toLineString() ?: "")
+    if (cursorOnThisLine && cursorBlink) {
+        builder
+            .addStyle(
+                SpanStyle(background = Color.Black, color = Color.White),
+                cursorX - 1, cursorX
+            )
     }
+    Text(
+        text = builder.toAnnotatedString()
+    )
 
 }
