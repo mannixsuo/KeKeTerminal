@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import buffer.IBufferLine
@@ -24,17 +26,18 @@ fun TerminalView(terminal: Terminal) {
     var cursorBlink by remember { mutableStateOf(false) }
     var cursorX by remember { mutableStateOf(0) }
     var cursorY by remember { mutableStateOf(0) }
-
     val timer by remember { mutableStateOf(Timer()) }
+    var text by remember { mutableStateOf("") }
+//    val textInputService = LocalTextInputService.current
+
+
     if (!timerInitialed) {
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 cursorBlink = !cursorBlink
-                print(cursorBlink)
                 lines = terminal.bufferService.getActiveBuffer().getLine(0, 100)
                 cursorX = terminal.bufferService.getActiveBuffer().x
                 cursorY = terminal.bufferService.getActiveBuffer().y
-
             }
         }, 1000, 500)
         timerInitialed = true
@@ -42,6 +45,8 @@ fun TerminalView(terminal: Terminal) {
 
     Surface {
         Column {
+            TextField(text, onValueChange = { text = it })
+
             Text("cursor (${cursorX},${cursorY})")
             Lines(lines, cursorX, cursorY, cursorBlink)
         }
@@ -81,5 +86,6 @@ fun LineContent(line: IBufferLine, cursorOnThisLine: Boolean, cursorBlink: Boole
     Text(
         text = builder.toAnnotatedString()
     )
+
 
 }

@@ -2,6 +2,11 @@ package terminal
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
+import androidx.compose.ui.platform.LocalTextInputService
 import buffer.BufferLine
 import buffer.BufferService
 import buffer.CellData
@@ -9,8 +14,6 @@ import buffer.IBufferService
 import org.slf4j.LoggerFactory
 import parser.Parser
 import shell.Shell
-import java.io.IOException
-import java.io.InputStreamReader
 
 class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
     var repaint: MutableState<Boolean> = mutableStateOf(true)
@@ -63,13 +66,25 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
 
     fun start() {
         startReadFromChannel()
-        startWriteToChannel()
         bufferService.getActiveBuffer().addLine(currentLine)
     }
 
     fun stop() {
         channelInputStreamReader.close()
         channelOutputStreamWriter.close()
+    }
+
+    fun onKeyEvent(event: KeyEvent): Boolean {
+        if (event.type == KeyEventType.KeyDown) {
+            var toInt = event.utf16CodePoint
+            if (toInt == 10) {
+                toInt = 13
+            }
+            channelOutputStreamWriter.write(toInt)
+            channelOutputStreamWriter.flush()
+            return true
+        }
+        return false
     }
 
     private fun startReadFromChannel() {
@@ -83,23 +98,4 @@ class Terminal(shell: Shell, private val terminalConfig: TerminalConfig) {
         }.start()
     }
 
-    private fun startWriteToChannel() {
-        Thread {
-            val inputStreamReader = InputStreamReader(System.`in`)
-            val buf = CharArray(1024)
-            var length: Int
-            try {
-                while (inputStreamReader.read(buf).also { length = it } != -1) {
-                    val s = String(buf, 0, length)
-                    if ("\n" == s) {
-                        channelOutputStreamWriter.write(13)
-                    } else {
-                        channelOutputStreamWriter.write(buf, 0, length)
-                    }
-                    channelOutputStreamWriter.flush()
-                }
-            } catch (ignore: IOException) {
-            }
-        }.start()
-    }
 }

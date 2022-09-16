@@ -155,7 +155,11 @@ class Buffer : IBuffer {
     override fun setLine(index: Int, line: IBufferLine) {
         try {
             lock.lock()
-            buffer[index] = line
+            if (index >= buffer.size) {
+                buffer.add(line)
+            } else {
+                buffer[index] = line
+            }
         } finally {
             lock.unlock()
         }
