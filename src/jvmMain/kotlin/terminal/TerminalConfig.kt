@@ -1,7 +1,7 @@
 package terminal
 
-import buffer.Theme
-import buffer.defaultTheme
+import terminal.buffer.Theme
+import terminal.buffer.defaultTheme
 
 class TerminalConfig {
 

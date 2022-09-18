@@ -4,9 +4,7 @@ import character.NON_ASCII_PRINTABLE
 import character.TransitionTable
 import org.slf4j.LoggerFactory
 import terminal.Terminal
-import terminal.TerminalInputHandler
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import terminal.TerminalInputProcessor
 import java.util.*
 
 class Parser(private val terminal: Terminal) {
@@ -21,9 +19,9 @@ class Parser(private val terminal: Terminal) {
     private val transitionTable = TransitionTable(4096)
     private val oscHandler = OSCHandler()
     private var dcsHandler = DCSHandler()
-    private val terminalInputHandler = TerminalInputHandler(terminal)
-    private val csiHandler = CsiHandler(terminalInputHandler)
-    private val singleCharacterFunHandler = SingleCharacterFunHandler(terminalInputHandler)
+    private val terminalInputProcessor = TerminalInputProcessor(terminal)
+    private val csiHandler = CsiHandler(terminalInputProcessor)
+    private val singleCharacterFunHandler = SingleCharacterFunHandler(terminalInputProcessor)
 
     init {
         initTransitionTable()
@@ -309,7 +307,7 @@ class Parser(private val terminal: Terminal) {
     private fun onChar(code: Int) {
         val (nextAction, nextState) = transitionTable.queryTable(code, currentState)
         if (logger.isDebugEnabled) {
-            logger.debug("ON CHAR [${if (code.toChar().isISOControl())code else code.toChar()}]")
+            logger.debug("ON CHAR [${if (code.toChar().isISOControl()) code else code.toChar()}]")
             logger.debug(
                 "CURRENT: [ {}, {} ] -> NEXT: [ {}, {} ]", currentState, code, nextState, nextAction
             )
@@ -317,8 +315,7 @@ class Parser(private val terminal: Terminal) {
         when (nextAction) {
             ParserAction.IGNORE, ParserAction.ERROR -> {}
             ParserAction.PRINT -> {
-                print(Char(code))
-                terminal.printChar(code)
+                terminal.terminalOutputProcessor.process(code)
             }
 
             ParserAction.EXECUTE -> {

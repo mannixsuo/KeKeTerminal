@@ -1,4 +1,4 @@
-package buffer
+package terminal.buffer
 
 
 class CircularList<T> {

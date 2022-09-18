@@ -1,9 +1,6 @@
 package terminal
 
-import buffer.BufferLine
-import parser.Direction
-
-class TerminalInputHandler(private val terminal: Terminal) {
+class CSIProcessor(private val terminal: Terminal) {
 
     private val bufferService = terminal.bufferService
 
@@ -14,7 +11,11 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun insertChars(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y)?.insertChar(scrollX + x, params.elementAtOrElse(0) { 1 }, ' ')
+            val cells = buildCells(0.toChar(), params.elementAtOrElse(0) { 1 }, terminal)
+            getLine(terminal.scrollY + terminal.cursorY)?.insertCells(
+                terminal.cursorX + terminal.scrollX,
+                cells
+            )
         }
     }
 
@@ -25,7 +26,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun shiftLeft(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y)?.shift(Direction.LEFT, params.elementAtOrElse(0) { 1 })
+            getLine(scrollY + y)?.shift(parser.Direction.LEFT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -36,7 +37,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorUp(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.UP, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.UP, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -47,7 +48,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorRight(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            getLine(scrollY + y)?.shift(Direction.RIGHT, params.elementAtOrElse(0) { 1 })
+            getLine(scrollY + y)?.shift(parser.Direction.RIGHT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -58,7 +59,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorDown(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.DOWN, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.DOWN, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -69,7 +70,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorForward(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.RIGHT, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.RIGHT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -80,7 +81,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorBackward(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.LEFT, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.LEFT, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -91,7 +92,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorNextLine(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.DOWN, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.DOWN, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -102,7 +103,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
     fun cursorPrecedingLine(params: Array<Int>) {
         val activeBuffer = bufferService.getActiveBuffer()
         with(activeBuffer) {
-            moveCursor(Direction.UP, params.elementAtOrElse(0) { 1 })
+            moveCursor(parser.Direction.UP, params.elementAtOrElse(0) { 1 })
         }
     }
 
@@ -150,26 +151,26 @@ class TerminalInputHandler(private val terminal: Terminal) {
         with(activeBuffer) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
-                    for (index in (y + 1)..screenRows) {
-                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
+                    for (index in (y + 1)..maxScreenRows) {
+                        getLine(scrollY + index)?.eraseLine(0, kotlin.Int.MAX_VALUE)
                     }
                 }
 
                 1 -> {
                     for (index in (y - 1) downTo 0) {
-                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
+                        getLine(scrollY + index)?.eraseLine(0, kotlin.Int.MAX_VALUE)
                     }
                 }
 
                 2 -> {
                     for (index in 0..y) {
-                        getLine(scrollY + index)?.eraseLine(0, Int.MAX_VALUE)
+                        getLine(scrollY + index)?.eraseLine(0, kotlin.Int.MAX_VALUE)
                     }
                 }
                 //Ps = 3  ⇒  Erase Saved Lines, xterm.
                 3 -> {
                     for (index in 0..scrollY + y) {
-                        getLine(index)?.eraseLine(0, Int.MAX_VALUE)
+                        getLine(index)?.eraseLine(0, kotlin.Int.MAX_VALUE)
                     }
                 }
             }
@@ -199,7 +200,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
         with(activeBuffer) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
-                    getLine(scrollY + y)?.eraseLine(scrollX + x, Int.MAX_VALUE)
+                    getLine(scrollY + y)?.eraseLine(scrollX + x, kotlin.Int.MAX_VALUE)
                 }
 
                 1 -> {
@@ -207,7 +208,7 @@ class TerminalInputHandler(private val terminal: Terminal) {
                 }
 
                 2 -> {
-                    getLine(scrollY + y)?.eraseLine(0, Int.MAX_VALUE)
+                    getLine(scrollY + y)?.eraseLine(0, kotlin.Int.MAX_VALUE)
                 }
 
                 else -> {}
@@ -249,24 +250,5 @@ class TerminalInputHandler(private val terminal: Terminal) {
      */
     fun deleteCharacters(params: Array<Int>) {
         TODO("Not yet implemented")
-    }
-
-    fun carriageReturn() {
-        val activeBuffer = bufferService.getActiveBuffer()
-        with(activeBuffer) {
-            x = 0
-            scrollX = 0
-            y++
-        }
-        terminal.repaint.value = true
-
-    }
-
-    fun newLine() {
-        val activeBuffer = bufferService.getActiveBuffer()
-        with(activeBuffer) {
-            setLine(scrollY + y, BufferLine(1))
-        }
-        terminal.repaint.value = true
     }
 }
