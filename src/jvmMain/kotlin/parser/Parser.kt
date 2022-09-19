@@ -21,7 +21,6 @@ class Parser(private val terminal: Terminal) {
     private var dcsHandler = DCSHandler()
     private val terminalInputProcessor = TerminalInputProcessor(terminal)
     private val csiHandler = CsiHandler(terminalInputProcessor)
-    private val singleCharacterFunHandler = SingleCharacterFunHandler(terminalInputProcessor)
 
     init {
         initTransitionTable()
@@ -319,7 +318,7 @@ class Parser(private val terminal: Terminal) {
             }
 
             ParserAction.EXECUTE -> {
-                singleCharacterFunHandler.handleCode(code)
+                terminalInputProcessor.singleCharacterFunProcessor.handleCode(code)
             }
 
             ParserAction.CLEAR -> {
@@ -371,12 +370,5 @@ class Parser(private val terminal: Terminal) {
         currentAction = nextAction
     }
 
-    private fun dcsHook(collect: Array<Char>, params: Params, code: Int): DCSHandler {
-        TODO("Not yet implemented")
-    }
-
-    private fun escDispatch(collect: Array<Char>, code: Int): Executor {
-        TODO("Not yet implemented")
-    }
 
 }

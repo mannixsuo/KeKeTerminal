@@ -7,14 +7,13 @@ class TerminalOutputProcessor(private val terminal: Terminal) {
         with(activeBuffer) {
             try {
                 lock.lock()
-                var lastLine = getLastLine()
-                if (lastLine == null) {
-                    lastLine = Line(terminal.terminalConfig.columns)
-                    appendLine(lastLine)
+                var lineAtCurrentCursor = getLine(terminal.scrollY + terminal.cursorY)
+                if (lineAtCurrentCursor == null) {
+                    lineAtCurrentCursor = Line(terminal.terminalConfig.columns)
+                    insertLine(terminal.scrollY + terminal.cursorY, lineAtCurrentCursor)
                 }
-                lastLine.appendCell(
-                    buildCell(code.toChar(), terminal)
-                )
+                lineAtCurrentCursor.appendCell(buildCell(code.toChar(), terminal))
+                terminal.cursorX++
             } finally {
                 lock.unlock()
             }

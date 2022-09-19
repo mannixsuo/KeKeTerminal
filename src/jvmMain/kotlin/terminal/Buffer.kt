@@ -12,13 +12,6 @@ interface ILineBuffer {
     val lock: Lock
 
     /**
-     * get last line
-     *
-     * return null if it's empty
-     */
-    fun getLastLine(): ILine?
-
-    /**
      * get line at index of the buffer
      */
     fun getLine(index: Int): ILine?
@@ -46,6 +39,14 @@ interface ILineBuffer {
     fun deleteLine(index: Int)
 
 
+    /**
+     * delete lines in range
+     *
+     * line behind the index will move up
+     */
+    fun deleteLines(range: IntRange)
+
+
     fun lineCount(): Int
 
 }
@@ -57,25 +58,20 @@ class LineBuffer : ILineBuffer {
 
     private val _buffer = LinkedList<ILine>()
 
-    override fun getLastLine(): ILine? {
-        return if (_buffer.size == 0) {
-            null
-        } else {
-            _buffer.last
-        }
-    }
 
     override fun getLine(index: Int): ILine? {
-        return if (index !in 0.._buffer.size) {
-            null
-        } else {
-            _buffer[index]
+        if (_buffer.size == 0) {
+            return null
         }
+        if (index >= _buffer.size) {
+            return null
+        }
+        return _buffer[index]
     }
 
     override fun getLines(range: IntRange): List<ILine> {
         val start = 0.coerceAtLeast(range.first)
-        val end = _buffer.size.coerceAtMost(range.last)
+        val end = (_buffer.size - 1).coerceAtMost(range.last)
         return _buffer.slice(IntRange(start, end))
     }
 
@@ -84,13 +80,22 @@ class LineBuffer : ILineBuffer {
     }
 
     override fun insertLine(index: Int, line: ILine) {
-        _buffer.add(index, line)
+        if (index >= _buffer.size) {
+            for (i in 0..index - _buffer.size) {
+                _buffer.add(Line(line.maxLength()))
+            }
+        }
+        _buffer[index] = line
     }
 
     override fun deleteLine(index: Int) {
         if (index in 0 until _buffer.size) {
             _buffer.removeAt(index)
         }
+    }
+
+    override fun deleteLines(range: IntRange) {
+
     }
 
     override fun lineCount(): Int {
