@@ -101,7 +101,7 @@ fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorBlink: () -> Boole
     }
     if (cursorOnThisLine && cursorBlink.invoke()) {
         if (cursorX >= line.length()) {
-            builder.append('_')
+            builder.append('|')
             builder.pushStyle(SpanStyle(background = Color.Black, color = Color.Black))
         } else {
             val cellAtCursor = cells[cursorX]

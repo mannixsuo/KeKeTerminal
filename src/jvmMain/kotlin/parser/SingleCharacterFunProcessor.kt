@@ -27,9 +27,15 @@ class SingleCharacterFunProcessor(private val terminal: Terminal) {
 
     /**
      * move cursor at start position in next line
+     *
+     * if current cursor locate at bottom of screen then scroll up
      */
     private fun carriageReturn() {
         terminal.cursorY += 1
+        if (terminal.cursorY >= terminal.terminalConfig.rows) {
+            terminal.scrollY++
+            terminal.cursorY = terminal.terminalConfig.rows - 1
+        }
         terminal.cursorX = 0
         terminal.scrollX = 0
     }

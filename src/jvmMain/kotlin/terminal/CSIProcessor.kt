@@ -228,7 +228,12 @@ class CSIProcessor(private val terminal: Terminal) {
      * Insert Ps Line(s) (default = 1) (IL).
      */
     fun insertLines(params: Array<Int>) {
-        TODO("Not yet implemented")
+        val activeBuffer = bufferService.getActiveBuffer()
+        val param = params.elementAtOrElse(0) { 1 }
+        with(activeBuffer) {
+            TODO()
+//            this.insertLine()
+        }
     }
 
     /**
