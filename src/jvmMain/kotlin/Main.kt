@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.ResourceLoader
 import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -13,22 +12,25 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import com.pty4j.PtyProcessBuilder
 import org.slf4j.LoggerFactory
+import shell.JschShell
 import shell.LocalPty
 import shell.Shell
+import shell.UserInfoCompose
 import terminal.Terminal
 import terminal.TerminalConfig
 import ui.TerminalView
-import java.io.InputStream
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
+//        UserInfoCompose()
         TerminalView(terminal)
     }
 }
 
 val terminalConfig = TerminalConfig()
+
 val localShell: Shell = LocalPty(
     PtyProcessBuilder(arrayOf("powershell.exe"))
         .setInitialColumns(terminalConfig.columns)
@@ -36,7 +38,9 @@ val localShell: Shell = LocalPty(
         .start()
 )
 
-val terminal = Terminal(localShell, terminalConfig)
+val jschShell = JschShell("192.168.130.134", 38322, "app", "wingtech")
+
+val terminal = Terminal(jschShell, terminalConfig)
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {

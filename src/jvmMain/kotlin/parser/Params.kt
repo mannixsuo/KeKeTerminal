@@ -27,6 +27,9 @@ class Params {
     }
 
     fun toIntArray(): Array<Int> {
+        if (length == 0) {
+            return emptyArray()
+        }
         return params.sliceArray(IntRange(0, length))
     }
 

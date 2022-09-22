@@ -13,8 +13,7 @@ class CSIProcessor(private val terminal: Terminal) {
         with(activeBuffer) {
             val cells = buildCells(0.toChar(), params.elementAtOrElse(0) { 1 }, terminal)
             getLine(terminal.scrollY + terminal.cursorY)?.insertCells(
-                terminal.cursorX + terminal.scrollX,
-                cells
+                terminal.cursorX + terminal.scrollX, cells
             )
         }
     }
@@ -77,6 +76,10 @@ class CSIProcessor(private val terminal: Terminal) {
     /**
      * CSI Ps C
      * Cursor Forward Ps Times (default = 1) (CUF).
+     * The CUF sequence moves the active position to the right. The distance moved is determined by the parameter.
+     * A parameter value of zero or one moves the active position one position to the right.
+     * A parameter value of n moves the active position n positions to the right.
+     * If an attempt is made to move the cursor to the right of the right margin, the cursor stops at the right margin.
      */
     fun cursorForward(params: Array<Int>) {
         terminal.cursorX += params.elementAtOrElse(0) { 1 }
@@ -194,8 +197,7 @@ class CSIProcessor(private val terminal: Terminal) {
                 1 -> {
                     getLine(terminal.scrollY + terminal.cursorY)?.deleteCells(
                         IntRange(
-                            0,
-                            terminal.scrollX + terminal.cursorX + 1
+                            0, terminal.scrollX + terminal.cursorX + 1
                         )
                     )
                 }

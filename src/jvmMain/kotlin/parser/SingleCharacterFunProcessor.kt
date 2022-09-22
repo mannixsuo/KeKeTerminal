@@ -70,7 +70,7 @@ class SingleCharacterFunProcessor(private val terminal: Terminal) {
      * Sound bell tone from keyboard.
      */
     private fun bell() {
-        TODO()
+
     }
 
 
