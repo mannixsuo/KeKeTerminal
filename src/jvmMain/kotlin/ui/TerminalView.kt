@@ -11,6 +11,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import terminal.ILine
 import terminal.Terminal
 import ui.Fonts.jetbrainsMono
@@ -81,6 +84,7 @@ fun Line(index: Int, line: ILine, cursorOnThisLine: Boolean, cursorBlink: () -> 
 //    println("Line $index PAINT")
 }
 
+@OptIn(ExperimentalUnitApi::class)
 @Composable
 fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorBlink: () -> Boolean, cursorX: Int) {
 
@@ -111,6 +115,9 @@ fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorBlink: () -> Boole
         }
     }
     Text(
-        text = builder.toAnnotatedString(), fontFamily = jetbrainsMono()
+        text = builder.toAnnotatedString(),
+        fontFamily = jetbrainsMono(),
+        fontSize = TextUnit(12F, TextUnitType.Sp),
+        softWrap = false
     )
 }

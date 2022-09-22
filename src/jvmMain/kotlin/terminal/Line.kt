@@ -111,6 +111,9 @@ class Line(private val maxLength: Int) : ILine {
     }
 
     override fun appendCell(cell: ICell) {
+        if (_length >= maxLength) {
+            return
+        }
         _cells[_length++] = cell
     }
 
@@ -136,14 +139,16 @@ class Line(private val maxLength: Int) : ILine {
         for (i in index until _length) {
             _cells[i] = _cells[i + 1]
         }
+        _length -= 1
         return deleted
     }
 
     override fun deleteCells(range: IntRange) {
         val start = 0.coerceAtLeast(range.first)
         val end = _length.coerceAtMost(range.last)
-        for (i in start..end) {
+        for (i in start until end) {
             _cells[i] = _cells[end + 1]
+            _length--
         }
     }
 

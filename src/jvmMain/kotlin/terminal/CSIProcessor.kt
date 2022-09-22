@@ -112,7 +112,7 @@ class CSIProcessor(private val terminal: Terminal) {
      * Moves cursor to the Ps-th column of the active line. The default value of Ps is 1.
      */
     fun cursorCharacterAbsolute(params: Array<Int>) {
-        terminal.cursorX = params.elementAtOrElse(0) { 1 }
+        terminal.cursorX = params.elementAtOrElse(0) { 1 } - 1
     }
 
     /**
@@ -187,7 +187,7 @@ class CSIProcessor(private val terminal: Terminal) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
                     getLine(terminal.scrollY + terminal.cursorY)?.let {
-                        it.deleteCells(IntRange(terminal.scrollX + terminal.cursorX + 1, it.length()))
+                        it.deleteCells(IntRange(terminal.scrollX + terminal.cursorX, it.length()))
                     }
                 }
 

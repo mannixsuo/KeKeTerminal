@@ -55,6 +55,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.11")
     implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("com.jcraft:jsch:0.1.55")
     testImplementation("io.kotest:kotest-runner-junit5:${testVersion}")
     testImplementation("io.kotest:kotest-assertions-core:${testVersion}")
     testImplementation("io.kotest:kotest-property:${testVersion}")

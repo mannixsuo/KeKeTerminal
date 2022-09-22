@@ -13,7 +13,7 @@ import terminal.service.IBufferService
 @OptIn(ExperimentalComposeUiApi::class)
 class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
     var repaint: MutableState<Boolean> = mutableStateOf(true)
-
+    val keyboard = Keyboard()
     private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService()
     val terminalInputProcessor = TerminalInputProcessor(this)
@@ -59,11 +59,13 @@ class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
             when (event.key) {
                 Key.ShiftLeft, Key.ShiftRight, Key.CtrlLeft, Key.CtrlRight, Key.AltLeft, Key.AltRight -> return true
             }
-            var toInt = event.utf16CodePoint
-            if (toInt == 10) {
-                toInt = 13
+            val toInt = event.utf16CodePoint
+            val keyChar = keyboard.getKeyChar(event.key)
+            if (keyChar == null) {
+                channelOutputStreamWriter.write(toInt)
+            } else {
+                channelOutputStreamWriter.write(keyChar)
             }
-            channelOutputStreamWriter.write(toInt)
             channelOutputStreamWriter.flush()
             return true
         }

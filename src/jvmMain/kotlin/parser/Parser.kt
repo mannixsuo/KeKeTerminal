@@ -306,7 +306,7 @@ class Parser(private val terminal: Terminal) {
     private fun onChar(code: Int) {
         val (nextAction, nextState) = transitionTable.queryTable(code, currentState)
         if (logger.isDebugEnabled) {
-            logger.debug("ON CHAR [${if (code.toChar().isISOControl()) code else code.toChar()}]")
+            logger.debug("ON CHAR [${if (code.toChar().isISOControl()) code else code.toChar()}($code)]")
             logger.debug(
                 "CURRENT: [ {}, {} ] -> NEXT: [ {}, {} ]", currentState, code, nextState, nextAction
             )

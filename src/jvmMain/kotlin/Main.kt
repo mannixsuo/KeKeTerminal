@@ -2,6 +2,11 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.ResourceLoader
+import androidx.compose.ui.res.loadSvgPainter
+import androidx.compose.ui.res.useResource
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ch.qos.logback.classic.Level
@@ -13,6 +18,7 @@ import shell.Shell
 import terminal.Terminal
 import terminal.TerminalConfig
 import ui.TerminalView
+import java.io.InputStream
 
 @Composable
 @Preview
@@ -24,20 +30,25 @@ fun App() {
 
 val terminalConfig = TerminalConfig()
 val localShell: Shell = LocalPty(
-    PtyProcessBuilder(arrayOf("cmd.exe"))
+    PtyProcessBuilder(arrayOf("powershell.exe"))
         .setInitialColumns(terminalConfig.columns)
         .setInitialRows(terminalConfig.rows)
         .start()
 )
+
 val terminal = Terminal(localShell, terminalConfig)
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
     terminal.start()
-
-    Window(onCloseRequest = {
-        terminal.stop()
-        exitApplication()
-    }, title = "CoCoTerminal", onKeyEvent = { terminal.onKeyEvent(it) }) {
+    Window(
+        onCloseRequest = {
+            terminal.stop()
+            exitApplication()
+        },
+        title = "CoCoTerminal",
+        icon = loadSvgPainter(ResourceLoader.Default.load("icon/terminal.svg"), Density(10F)),
+        onKeyEvent = { terminal.onKeyEvent(it) }) {
         App()
     }
     val parentLogger = LoggerFactory.getLogger("kotlin") as Logger

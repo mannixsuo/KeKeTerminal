@@ -3,6 +3,9 @@ package terminal
 class TerminalOutputProcessor(private val terminal: Terminal) {
 
     fun process(code: Int) {
+        if (code == 0xFFFF) {
+            return
+        }
         val activeBuffer = terminal.bufferService.getActiveBuffer()
         with(activeBuffer) {
             try {
