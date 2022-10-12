@@ -1,7 +1,5 @@
 package terminal
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
 import org.slf4j.LoggerFactory
@@ -9,16 +7,24 @@ import parser.Parser
 import shell.Shell
 import terminal.service.BufferService
 import terminal.service.IBufferService
+import ui.SingleSelection
 
 @OptIn(ExperimentalComposeUiApi::class)
 class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
-    var repaint: MutableState<Boolean> = mutableStateOf(true)
     val keyboard = Keyboard()
     private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService()
     val terminalInputProcessor = TerminalInputProcessor(this)
     val terminalOutputProcessor = TerminalOutputProcessor(this)
+    val title: String = "Terminal Title"
+    var close: (() -> Unit)? = null
+    lateinit var selection: SingleSelection
+    val isActive: Boolean
+        get() = selection.selected === this
 
+    fun activate() {
+        selection.selected = this
+    }
     /**
      * current cursor position x
      */

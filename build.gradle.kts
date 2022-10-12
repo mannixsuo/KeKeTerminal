@@ -49,12 +49,19 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-val testVersion = "5.4.2"
+plugins.withId("org.jetbrains.kotlin.multiplatform") {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    }
+}
+
+val testVersion = "5.5.0"
 dependencies {
-    implementation("org.jetbrains.pty4j:pty4j:0.12.7")
-    implementation("ch.qos.logback:logback-classic:1.2.11")
-    implementation("ch.qos.logback:logback-core:1.2.11")
-    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("com.formdev:flatlaf:2.5")
+    implementation("org.jetbrains.pty4j:pty4j:0.12.9")
+    implementation("ch.qos.logback:logback-classic:1.4.3")
+    implementation("ch.qos.logback:logback-core:1.4.3")
+    implementation("org.slf4j:slf4j-api:2.0.3")
     implementation("com.jcraft:jsch:0.1.55")
     testImplementation("io.kotest:kotest-runner-junit5:${testVersion}")
     testImplementation("io.kotest:kotest-assertions-core:${testVersion}")
