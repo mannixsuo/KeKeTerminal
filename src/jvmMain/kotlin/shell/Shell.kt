@@ -9,4 +9,6 @@ interface Shell {
 
     fun getChannelOutputStreamWriter(): OutputStreamWriter
 
+    fun close()
+
 }

@@ -10,21 +10,27 @@ import terminal.service.IBufferService
 import ui.SingleSelection
 
 @OptIn(ExperimentalComposeUiApi::class)
-class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
+class Terminal(val shell: Shell, val terminalConfig: TerminalConfig) {
     val keyboard = Keyboard()
     private val logger = LoggerFactory.getLogger(Terminal::class.java)
     val bufferService: IBufferService = BufferService()
     val terminalInputProcessor = TerminalInputProcessor(this)
     val terminalOutputProcessor = TerminalOutputProcessor(this)
     val title: String = "Terminal Title"
-    var close: (() -> Unit)? = null
+
+    var close: (() -> Unit) = fun() { stop() }
+    var onLineChange: (() -> Unit)? = null
+    var viewInitialized: (() -> Boolean) = { false }
+
     lateinit var selection: SingleSelection
     val isActive: Boolean
         get() = selection.selected === this
 
     fun activate() {
         selection.selected = this
+        onLineChange?.invoke()
     }
+
     /**
      * current cursor position x
      */
@@ -56,8 +62,8 @@ class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
     }
 
     fun stop() {
-        channelInputStreamReader.close()
-        channelOutputStreamWriter.close()
+        println("terminal stop")
+        shell.close()
     }
 
     fun onKeyEvent(event: KeyEvent): Boolean {
@@ -85,8 +91,17 @@ class Terminal(shell: Shell, val terminalConfig: TerminalConfig) {
             while (channelInputStreamReader.read(buf).also { length = it } != -1) {
                 parser.onCharArray(buf.copyOfRange(0, length))
                 print(String(buf, 0, length))
+                refreshUI()
             }
         }.start()
+    }
+
+    fun refreshUI() {
+        if (viewInitialized()) {
+            if (isActive) {
+                onLineChange?.invoke()
+            }
+        }
     }
 
 }

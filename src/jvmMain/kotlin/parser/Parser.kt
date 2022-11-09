@@ -314,7 +314,7 @@ class Parser(private val terminal: Terminal) {
         when (nextAction) {
             ParserAction.IGNORE, ParserAction.ERROR -> {}
             ParserAction.PRINT -> {
-                terminal.terminalOutputProcessor.process(code)
+                terminal.terminalOutputProcessor.print(code)
             }
 
             ParserAction.EXECUTE -> {

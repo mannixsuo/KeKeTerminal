@@ -2,7 +2,7 @@ package terminal
 
 class TerminalOutputProcessor(private val terminal: Terminal) {
 
-    fun process(code: Int) {
+    fun print(code: Int) {
         if (code == 0xFFFF) {
             return
         }
@@ -15,7 +15,7 @@ class TerminalOutputProcessor(private val terminal: Terminal) {
                     lineAtCurrentCursor = Line(terminal.terminalConfig.columns)
                     insertLine(terminal.scrollY + terminal.cursorY, lineAtCurrentCursor)
                 }
-                lineAtCurrentCursor.appendCell(buildCell(code.toChar(), terminal))
+                lineAtCurrentCursor.replaceCell(terminal.scrollX + terminal.cursorX, buildCell(code.toChar(), terminal))
                 terminal.cursorX++
             } finally {
                 lock.unlock()

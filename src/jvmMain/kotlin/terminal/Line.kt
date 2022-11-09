@@ -1,5 +1,7 @@
 package terminal
 
+import terminal.buffer.defaultTheme
+
 /**
  * A line represent one line in window
  * it contains some characters
@@ -118,9 +120,8 @@ class Line(private val maxLength: Int) : ILine {
     }
 
     override fun replaceCell(index: Int, replacement: ICell) {
-        if (index in 0.._length) {
-            _cells[index] = replacement
-        }
+        _cells[index] = replacement
+        _length = Math.max(index + 1, _length)
     }
 
     override fun replaceCells(range: IntRange, replacement: ICell) {
@@ -158,5 +159,13 @@ class Line(private val maxLength: Int) : ILine {
 
     override fun length(): Int {
         return _length
+    }
+
+    override fun toString(): String {
+        val builder = StringBuilder()
+        _cells.forEach {
+            builder.append(it?.char)
+        }
+        return String(builder)
     }
 }

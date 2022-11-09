@@ -7,7 +7,6 @@ import terminal.Terminal
 class SingleCharacterFunProcessor(private val terminal: Terminal) {
     private val logger = LoggerFactory.getLogger(SingleCharacterFunProcessor::class.java)
     private val commandExecutorMap = HashMap<Int, SingleCharacterFun>()
-    private val bufferService = terminal.bufferService
 
     fun handleCode(code: Int) {
         with(commandExecutorMap) {
@@ -102,7 +101,7 @@ class SingleCharacterFunProcessor(private val terminal: Terminal) {
             terminal.scrollY++
             terminal.cursorY = terminal.terminalConfig.rows - 1
         }
-        bufferService.getActiveBuffer()
+        terminal.bufferService.getActiveBuffer()
             .insertLine(terminal.scrollY + terminal.cursorY, Line(terminal.terminalConfig.columns))
     }
 }

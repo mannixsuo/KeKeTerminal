@@ -8,10 +8,10 @@ import java.io.OutputStreamWriter
 class JschShell(val host: String, val port: Int, val userName: String, val password: String) : Shell {
     private val inputStreamReader: InputStreamReader
     private val outputStreamWriter: OutputStreamWriter
+    val jsch = JSch()
+    val session = jsch.getSession(userName, host, port)
 
     init {
-        val jsch = JSch()
-        val session = jsch.getSession(userName, host, port)
         session.setPassword(password)
         session.userInfo = UserInfoImpl()
         session.connect()
@@ -30,5 +30,9 @@ class JschShell(val host: String, val port: Int, val userName: String, val passw
 
     override fun getChannelOutputStreamWriter(): OutputStreamWriter {
         return outputStreamWriter
+    }
+
+    override fun close() {
+        session.disconnect()
     }
 }

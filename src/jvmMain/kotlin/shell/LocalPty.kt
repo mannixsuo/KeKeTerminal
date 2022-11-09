@@ -6,7 +6,7 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 
-class LocalPty(private val ptyProcess: PtyProcess) : Shell {
+class LocalPty(val ptyProcess: PtyProcess) : Shell {
 
     private val ptyOutPutStream: OutputStream = ptyProcess.outputStream
     private val ptyOutPutStreamWriter: OutputStreamWriter = OutputStreamWriter(ptyOutPutStream)
@@ -21,5 +21,10 @@ class LocalPty(private val ptyProcess: PtyProcess) : Shell {
 
     override fun getChannelOutputStreamWriter(): OutputStreamWriter {
         return ptyOutPutStreamWriter
+    }
+
+    override fun close() {
+        ptyProcess.destroy()
+        println("LocalPty close ${ptyProcess.pid()}")
     }
 }

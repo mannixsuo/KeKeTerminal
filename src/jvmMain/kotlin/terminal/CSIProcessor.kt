@@ -2,14 +2,12 @@ package terminal
 
 class CSIProcessor(private val terminal: Terminal) {
 
-    private val bufferService = terminal.bufferService
-
     /**
      * CSI Ps @
      * Insert Ps (Blank) Character(s) (default = 1) (ICH).
      */
     fun insertChars(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         with(activeBuffer) {
             val cells = buildCells(0.toChar(), params.elementAtOrElse(0) { 1 }, terminal)
             getLine(terminal.scrollY + terminal.cursorY)?.insertCells(
@@ -23,7 +21,7 @@ class CSIProcessor(private val terminal: Terminal) {
      * Shift left Ps columns(s) (default = 1) (SL), ECMA-48.
      */
     fun shiftLeft(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         val shiftCount = params.elementAtOrElse(0) { 1 }
         with(activeBuffer) {
             getLine(terminal.scrollY + terminal.cursorY)?.getCells()?.let {
@@ -50,7 +48,7 @@ class CSIProcessor(private val terminal: Terminal) {
      * Shift right Ps columns(s) (default = 1) (SR), ECMA-48.
      */
     fun cursorRight(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         val shiftCount = params.elementAtOrElse(0) { 1 }
 
         with(activeBuffer) {
@@ -143,7 +141,7 @@ class CSIProcessor(private val terminal: Terminal) {
      * Ps = 3  ⇒  Erase Saved Lines, xterm.
      */
     fun eraseInDisplay(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         with(activeBuffer) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
@@ -185,7 +183,7 @@ class CSIProcessor(private val terminal: Terminal) {
      *  Ps = 2  ⇒  Erase All.
      */
     fun eraseInLine(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         with(activeBuffer) {
             when (params.elementAtOrElse(0) { 0 }) {
                 0 -> {
@@ -230,7 +228,7 @@ class CSIProcessor(private val terminal: Terminal) {
      * Insert Ps Line(s) (default = 1) (IL).
      */
     fun insertLines(params: Array<Int>) {
-        val activeBuffer = bufferService.getActiveBuffer()
+        val activeBuffer = terminal.bufferService.getActiveBuffer()
         val param = params.elementAtOrElse(0) { 1 }
         with(activeBuffer) {
             TODO()

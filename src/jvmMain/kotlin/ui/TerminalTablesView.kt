@@ -1,5 +1,6 @@
 package ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,43 +20,59 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import terminal.Terminal
 
 @Composable
 fun TerminalTablesView(model: Terminals) = Row(Modifier.horizontalScroll(rememberScrollState())) {
+
+    println("TerminalTablesView ${model.terminals.size}")
+
     for (terminal in model.terminals) {
-        TerminalTableView(terminal)
+        TerminalTableView(
+            terminal.title,
+            terminal.isActive,
+            fun() { terminal.activate() },
+            terminal.close
+        )
     }
+
 }
 
 @Composable
-fun TerminalTableView(terminal: Terminal) = Surface(
-    color = if (terminal.isActive) {
-        AppTheme.colors.backgroundLight
+fun TerminalTableView(title: String, isActive: Boolean, onClick: () -> Unit, onClose: (() -> Unit)?) = Surface(
+    shape = RectangleShape,
+    elevation = if (isActive) {
+        10.dp
     } else {
-        Color.Transparent
+        0.dp
+    },
+    border = if (isActive) {
+        BorderStroke(1.dp, Color(0xFF2B2B2B))
+    } else {
+        null
     }
 ) {
+
+    println("TerminalTableView")
+
     Row(
         Modifier
             .clickable(remember(::MutableInteractionSource), indication = null) {
-                terminal.activate()
+                onClick.invoke()
             }
-            .padding(0.dp),
+            .padding(1.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            terminal.title,
+            title,
             color = LocalContentColor.current,
             fontSize = 12.sp,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
 
-        val close = terminal.close
-
-        if (close != null) {
+        if (onClose != null) {
             Icon(
                 Icons.Default.Close,
                 tint = LocalContentColor.current,
@@ -64,7 +81,7 @@ fun TerminalTableView(terminal: Terminal) = Surface(
                     .size(24.dp)
                     .padding(4.dp)
                     .clickable {
-                        close()
+                        onClose.invoke()
                     }
             )
         } else {
