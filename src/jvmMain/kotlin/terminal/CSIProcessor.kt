@@ -1,5 +1,7 @@
 package terminal
 
+import kotlin.math.max
+
 class CSIProcessor(private val terminal: Terminal) {
 
     /**
@@ -80,7 +82,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * If an attempt is made to move the cursor to the right of the right margin, the cursor stops at the right margin.
      */
     fun cursorForward(params: Array<Int>) {
-        terminal.cursorX += params.elementAtOrElse(0) { 1 }
+        val step = max(1, params[0])
+        terminal.cursorX += step
     }
 
     /**
@@ -88,7 +91,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Cursor Backward Ps Times (default = 1) (CUB).
      */
     fun cursorBackward(params: Array<Int>) {
-        terminal.cursorX -= params.elementAtOrElse(0) { 1 }
+        val step = max(1, params[0])
+        terminal.cursorX -= step
     }
 
     /**
@@ -96,7 +100,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Cursor Next Line Ps Times (default = 1) (CNL).
      */
     fun cursorNextLine(params: Array<Int>) {
-        terminal.cursorY += params.elementAtOrElse(0) { 1 }
+        val step = max(1, params[0])
+        terminal.cursorY += step
     }
 
     /**
@@ -104,7 +109,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Cursor Preceding Line Ps Times (default = 1) (CPL).
      */
     fun cursorPrecedingLine(params: Array<Int>) {
-        terminal.cursorY -= params.elementAtOrElse(0) { 1 }
+        val step = max(1, params[0])
+        terminal.cursorY -= step
     }
 
     /**
@@ -113,7 +119,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Moves cursor to the Ps-th column of the active line. The default value of Ps is 1.
      */
     fun cursorCharacterAbsolute(params: Array<Int>) {
-        terminal.cursorX = params.elementAtOrElse(0) { 1 } - 1
+        val step = max(1, params[0])
+        terminal.cursorX = step - 1
     }
 
     /**
@@ -121,8 +128,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Cursor Position [row;column] (default = [1,1]) (CUP).
      */
     fun cursorPosition(params: Array<Int>) {
-        terminal.cursorY = params.elementAtOrElse(0) { 1 }
-        terminal.cursorX = params.elementAtOrElse(1) { 1 }
+        terminal.cursorY = max(1, params[0])
+        terminal.cursorX = max(1, params[1])
     }
 
     /**

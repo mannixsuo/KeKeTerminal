@@ -10,6 +10,7 @@ import ch.qos.logback.classic.Logger
 import com.pty4j.PtyProcessBuilder
 import org.slf4j.LoggerFactory
 import shell.LocalPty
+import shell.JschShell
 import shell.Shell
 import terminal.Terminal
 import terminal.TerminalConfig
@@ -25,20 +26,20 @@ fun rememberCocoTerminalAppState(terminals: Terminals) = remember(terminals) {
 
 
 val terminalConfig = TerminalConfig()
-
-val localShell: Shell = LocalPty(
-    PtyProcessBuilder(arrayOf("powershell.exe")).setInitialColumns(terminalConfig.columns)
-        .setInitialRows(terminalConfig.rows).start()
-)
+//
+//val localShell: Shell = LocalPty(
+//    PtyProcessBuilder(arrayOf("powershell.exe")).setInitialColumns(terminalConfig.columns)
+//        .setInitialRows(terminalConfig.rows).start()
+//)
 val localShell1: Shell = LocalPty(
     PtyProcessBuilder(arrayOf("powershell.exe")).setInitialColumns(terminalConfig.columns)
         .setInitialRows(terminalConfig.rows).start()
 )
 
 
-//val jschShell = JschShell("192.168.130.134", 38322, "app", "wingtech")
+val jschShell = JschShell("192.168.130.134", 38322, "app", "wingtech")
 
-val terminal = Terminal(localShell, terminalConfig)
+val terminal = Terminal(jschShell, terminalConfig)
 val terminal1 = Terminal(localShell1, terminalConfig)
 
 @Composable

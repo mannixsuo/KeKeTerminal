@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
@@ -12,12 +12,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.ExperimentalUnitApi
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import terminal.ILine
 import ui.Fonts.jetbrainsMono
-import java.util.*
 
 
 @Composable
@@ -66,9 +62,11 @@ fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorX: Int) {
         val cell = line.getCell(index)
         cell?.let {
             builder.append(it.char)
+            val bg = if (cursorOnThisLine && index == cursorX) it.fg else it.bg
+            val fg = if (cursorOnThisLine && index == cursorX) it.bg else it.fg
             val style = SpanStyle(
-                background = it.bg,
-                color = it.fg,
+                background = bg,
+                color = fg,
                 fontWeight = if (it.bold) FontWeight.Bold else FontWeight.Normal,
                 fontStyle = if (it.italic) FontStyle.Italic else FontStyle.Normal
             )
@@ -80,7 +78,7 @@ fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorX: Int) {
         fontFamily = jetbrainsMono(),
         softWrap = false
     )
-    if (cursorOnThisLine) {
+    if (cursorOnThisLine && cursorX > line.length()) {
         Text(
             modifier = Modifier.drawWithContent {
                 drawRect(Color.Black)
