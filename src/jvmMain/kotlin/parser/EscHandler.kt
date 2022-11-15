@@ -1,14 +1,19 @@
 package parser
 
-class EscHandler {
+import terminal.EscProcessor
+
+class EscHandler(val escProcessor: EscProcessor) {
     data class EscCommand(val first: Char, val second: Char?, val final: Char) {
         fun key(): Int {
             return generateKey(first, second, final)
         }
     }
-}
 
+    fun escDispatch(first: Char, second: Char?, final: Char) {
 
-fun generateKey(first: Char, second: Char?, final: Char): Int {
-    return (final.code shl 16) or (first.code shl 8) or (second?.code ?: 0)
+        when (final) {
+            '=' -> escProcessor.applicationKeypad()
+            '>' -> escProcessor.normalKeypad()
+        }
+    }
 }

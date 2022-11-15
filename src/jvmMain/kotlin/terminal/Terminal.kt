@@ -17,6 +17,7 @@ class Terminal(val shell: Shell, val terminalConfig: TerminalConfig) {
     val terminalInputProcessor = TerminalInputProcessor(this)
     val terminalOutputProcessor = TerminalOutputProcessor(this)
     val title: String = "Terminal Title"
+    val state = TerminalState()
 
     var close: (() -> Unit) = fun() { stop() }
     var onLineChange: (() -> Unit)? = null
