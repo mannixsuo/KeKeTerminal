@@ -19,8 +19,8 @@ class Theme {
         val magenta = Color.Magenta
         val cyan = Color.Cyan
         val white = Color.White
-        val defaultForeground = black
-        val defaultBackground = white
+        val defaultForeground = white
+        val defaultBackground = black
 
     }
 

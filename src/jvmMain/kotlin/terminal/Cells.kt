@@ -14,11 +14,17 @@ interface ICell {
     val italic: Boolean
 }
 
-class Cell(override var char: Char,
-           override val bg: Color,
-           override val fg: Color,
-           override val bold: Boolean,
-           override val italic: Boolean) : ICell
+class Cell(
+    override var char: Char,
+    override val bg: Color,
+    override val fg: Color,
+    override val bold: Boolean,
+    override val italic: Boolean
+) : ICell {
+    override fun toString(): String {
+        return char.toString()
+    }
+}
 
 /**
  * TODO do we need this?

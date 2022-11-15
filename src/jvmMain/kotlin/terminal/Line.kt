@@ -163,8 +163,8 @@ class Line(private val maxLength: Int) : ILine {
 
     override fun toString(): String {
         val builder = StringBuilder()
-        _cells.forEach {
-            builder.append(it?.char)
+        for (index in 0 until _length){
+            builder.append(getCell(index)?.char)
         }
         return String(builder)
     }

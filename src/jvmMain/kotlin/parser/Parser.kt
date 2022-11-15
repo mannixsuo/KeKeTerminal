@@ -21,6 +21,7 @@ class Parser(private val terminal: Terminal) {
     private var dcsHandler = DCSHandler()
     private val terminalInputProcessor = TerminalInputProcessor(terminal)
     private val csiHandler = CsiHandler(terminalInputProcessor)
+    private val escHandler = EscHandler(terminalInputProcessor)
 
     init {
         initTransitionTable()
