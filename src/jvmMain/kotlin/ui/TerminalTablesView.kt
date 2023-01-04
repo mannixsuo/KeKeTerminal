@@ -26,9 +26,6 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TerminalTablesView(model: Terminals) = Row(Modifier.horizontalScroll(rememberScrollState())) {
-
-    println("TerminalTablesView ${model.terminals.size}")
-
     for (terminal in model.terminals) {
         TerminalTableView(
             terminal.title,
@@ -54,9 +51,6 @@ fun TerminalTableView(title: String, isActive: Boolean, onClick: () -> Unit, onC
         null
     }
 ) {
-
-    println("TerminalTableView")
-
     Row(
         Modifier
             .clickable(remember(::MutableInteractionSource), indication = null) {

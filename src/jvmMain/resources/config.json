@@ -1,5 +1,21 @@
 {
-  "hosts": [
+  "ui": {
+    "columns": 120,
+    "rows": 30,
+    "theme": {
+      "colors": {
+        "black": "0xFF000000",
+        "red": "0xFFFF0000",
+        "green": "0xFF00FF00",
+        "yellow": "0xFFFFFF00",
+        "blue": "0xFF0000FF",
+        "magenta": "0xFFFF00FF",
+        "cyan": "0xFF00FFFF",
+        "white": "0xFFFFFFFF"
+      }
+    }
+  },
+  "sessions": [
     {
       "host": "192.168.130.134",
       "port": 38322,

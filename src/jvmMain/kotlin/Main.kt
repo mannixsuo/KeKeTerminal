@@ -3,16 +3,18 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.singleWindowApplication
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import com.pty4j.PtyProcessBuilder
+import config.Session
+import config.readConfigFromFile
 import org.slf4j.LoggerFactory
 import shell.JschShell
 import shell.LocalPty
@@ -24,11 +26,12 @@ import ui.Terminals
 
 class CoCoTerminalAppState(val terminals: Terminals) {}
 
+val sessions = readConfigFromFile().sessions
+
 @Composable
-fun rememberCocoTerminalAppState(terminals: Terminals) = remember(terminals) {
+fun rememberCocoTerminalAppState(terminals: Terminals): CoCoTerminalAppState = remember(terminals) {
     CoCoTerminalAppState(terminals)
 }
-
 
 val terminalConfig = TerminalConfig()
 
@@ -51,12 +54,22 @@ val terminal1 = Terminal(localShell1, terminalConfig)
 @Composable
 @Preview
 fun App(appState: CoCoTerminalAppState) {
-    TerminalViews(appState)
+
+    Row {
+        TerminalViews(appState)
+        SessionSelection(sessions)
+    }
+
 }
 
 @Composable
-fun SessionSelection(){
-
+@Preview
+fun SessionSelection(sessions: List<Session>) {
+    Column {
+        sessions.forEach {
+            it.host?.let { it1 -> Text(it1) }
+        }
+    }
 }
 
 @Composable
@@ -67,7 +80,7 @@ fun AddSessionModal(open: Boolean, onCloseRequest: () -> Unit) {
     var user by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     if (open) {
-        Dialog(onCloseRequest = onCloseRequest, title = "新增会话") {
+        Dialog(onCloseRequest = onCloseRequest, title = "New Session") {
             Column {
                 Column {
                     TextField(label = { Text("Host") }, value = host, onValueChange = { host = it })
@@ -77,10 +90,10 @@ fun AddSessionModal(open: Boolean, onCloseRequest: () -> Unit) {
                 }
                 Row {
                     Button(onClick = {}) {
-                        Text("确定")
+                        Text("Confirm")
                     }
                     Button(onClick = onCloseRequest) {
-                        Text("取消")
+                        Text("Cancel")
                     }
                 }
             }
@@ -88,36 +101,34 @@ fun AddSessionModal(open: Boolean, onCloseRequest: () -> Unit) {
     }
 }
 
-fun main() = application {
-//    FlatLightLaf.setup();
-    val terminals = Terminals()
+val terminals = Terminals()
+
+fun main() = singleWindowApplication(title = "CoCoTerminal", onKeyEvent = { key ->
+    terminals.activeTerminal?.onKeyEvent(key) != null
+}) {
+    val appState = rememberCocoTerminalAppState(terminals)
+
+    var newSessionModalOpen by remember { mutableStateOf(false) }
     terminals.addNewTerminal(terminal)
     terminal.start()
-    val appState = rememberCocoTerminalAppState(terminals)
-    var newSessionModalOpen by remember { mutableStateOf(false) }
-
-    Window(onCloseRequest = {
-        exitApplication()
-    }, title = "CoCoTerminal", onKeyEvent = { key ->
-        terminals.activeTerminal?.onKeyEvent(key) != null
-    }) {
+    MaterialTheme {
         MenuBar {
-            Menu(text = "会话(F)", mnemonic = 'F') {
-                Item(text = "新建会话(N)", onClick = { newSessionModalOpen = true })
-                Item(text = "打开会话(O)", onClick = {})
+            Menu(text = "Sessions(F)", mnemonic = 'F') {
+                Item(text = "New(N)", onClick = { newSessionModalOpen = true })
+                Item(text = "Open(O)", onClick = {})
                 Separator()
-                Item(text = "日志(L)", onClick = {})
+                Item(text = "Logs(L)", onClick = {})
                 Separator()
-                Menu(text = "设置(S)") {
-                    Item(text = "默认设置(S)", onClick = {})
-                    Item(text = "会话设置(S)", onClick = {})
+                Menu(text = "Setting(S)") {
+                    Item(text = "Default(S)", onClick = {})
+                    Item(text = "New Session(S)", onClick = {})
                 }
                 Separator()
-                Item(text = "退出(X)", onClick = {})
+                Item(text = "Exit(X)", onClick = {})
             }
-            Menu(text = "编辑(E)", mnemonic = 'E') {
-                Item(text = "复制(C)", onClick = {})
-                Item(text = "黏贴(V)", onClick = {})
+            Menu(text = "Edit(E)", mnemonic = 'E') {
+                Item(text = "Copy(C)", onClick = {})
+                Item(text = "Past(V)", onClick = {})
             }
         }
         App(appState)
