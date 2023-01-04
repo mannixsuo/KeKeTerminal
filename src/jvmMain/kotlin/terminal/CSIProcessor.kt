@@ -128,8 +128,8 @@ class CSIProcessor(private val terminal: Terminal) {
      * Cursor Position [row;column] (default = [1,1]) (CUP).
      */
     fun cursorPosition(params: Array<Int>) {
-        terminal.cursorY = max(1, params[0])
-        terminal.cursorX = max(1, params[1])
+        terminal.cursorY = max(1, params.elementAtOrElse(0) { 0 })
+        terminal.cursorX = max(1, params.elementAtOrElse(1) { 0 })
     }
 
     /**

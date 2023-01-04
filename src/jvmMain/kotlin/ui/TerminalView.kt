@@ -1,7 +1,9 @@
 package ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,8 +26,8 @@ fun TerminalView(cursorX: Int = 0, cursorY: Int = 0, lines: List<ILine>) {
     println("TerminalView $cursorX $cursorY ${lines.size}")
 
     Surface {
-        Column {
-            Text("cursor (X: ${cursorX}, Y:${cursorY})")
+        Column(modifier = Modifier.background(Color.Black).fillMaxWidth()) {
+            Text(color = Color.White, text = "cursor (X: ${cursorX}, Y:${cursorY})")
             Lines(
                 lines, cursorX, cursorY
             )
@@ -46,11 +48,10 @@ fun Lines(lines: List<ILine>, cursorX: Int, cursorY: Int) {
 // cursorBlink: () -> Boolean : use function so only rows that cursor affects repaint every time cursor blink
 @Composable
 fun Line(index: Int, line: ILine, cursorOnThisLine: Boolean, cursorX: Int) {
-    Row {
+    Row(modifier = Modifier.background(Color.Black)) {
         Text(text = "$index  ", fontFamily = jetbrainsMono(), color = Color.LightGray)
         LineContent(line, cursorOnThisLine, cursorX)
     }
-//    println("Line $index PAINT")
 }
 
 @Composable
@@ -58,32 +59,46 @@ fun LineContent(line: ILine, cursorOnThisLine: Boolean, cursorX: Int) {
 
     val builder = AnnotatedString.Builder()
     val cells = line.getCells()
-    for (index in 0 until line.length()) {
-        val cell = line.getCell(index)
-        cell?.let {
-            builder.append(it.char)
-            val bg = if (cursorOnThisLine && index == cursorX) it.fg else it.bg
-            val fg = if (cursorOnThisLine && index == cursorX) it.bg else it.fg
-            val style = SpanStyle(
-                background = bg,
-                color = fg,
-                fontWeight = if (it.bold) FontWeight.Bold else FontWeight.Normal,
-                fontStyle = if (it.italic) FontStyle.Italic else FontStyle.Normal
-            )
-            builder.pushStyle(style)
+    val cursorInText: Boolean = cursorOnThisLine && line.length() != 0 && cursorX < line.length()
+
+    if (line.length() > 0) {
+        for (index in 0 until line.length()) {
+            val cell = line.getCell(index)
+            val cursorInThisPosition: Boolean = cursorInText && cursorX == index
+            cell?.let {
+                builder.append(it.char)
+                var bg = it.bg
+                var fg = it.fg
+                if (cursorInThisPosition) {
+                    bg = it.fg
+                    fg = it.bg
+                }
+                val style = SpanStyle(
+                    background = bg,
+                    color = fg,
+                    fontWeight = if (it.bold) FontWeight.Bold else FontWeight.Normal,
+                    fontStyle = if (it.italic) FontStyle.Italic else FontStyle.Normal
+                )
+                builder.addStyle(style, index, index + 1)
+            }
         }
-    }
-    Text(
-        text = builder.toAnnotatedString(),
-        fontFamily = jetbrainsMono(),
-        softWrap = false
-    )
-    if (cursorOnThisLine && cursorX > line.length()) {
         Text(
-            modifier = Modifier.drawWithContent {
-                drawRect(Color.Black)
-            },
-            text = "_",
+            text = builder.toAnnotatedString(),
+            fontFamily = jetbrainsMono(),
+            softWrap = false
         )
+    }
+
+    if (cursorOnThisLine) {
+        if (cursorInText) {
+
+        } else {
+            Text(
+                modifier = Modifier.drawWithContent {
+                    drawRect(Color.White)
+                },
+                text = "_",
+            )
+        }
     }
 }

@@ -36,19 +36,24 @@ fun rememberCocoTerminalAppState(terminals: Terminals): CoCoTerminalAppState = r
 val terminalConfig = TerminalConfig()
 
 //
-//val localShell: Shell = LocalPty(
-//    PtyProcessBuilder(arrayOf("powershell.exe")).setInitialColumns(terminalConfig.columns)
-//        .setInitialRows(terminalConfig.rows).start()
-//)
-val localShell1: Shell = LocalPty(
-    PtyProcessBuilder(arrayOf("powershell.exe")).setInitialColumns(terminalConfig.columns)
+val localShell: Shell = LocalPty(
+    PtyProcessBuilder(arrayOf("/bin/bash")).setInitialColumns(terminalConfig.columns)
         .setInitialRows(terminalConfig.rows).start()
+)
+val localShell1: Shell = LocalPty(
+    PtyProcessBuilder(arrayOf("/bin/bash"))
+        .setInitialColumns(terminalConfig.columns)
+        .setEnvironment(buildMap {
+            put("TERM","xterm")
+        })
+        .setInitialRows(terminalConfig.rows)
+        .start()
 )
 
 
-val jschShell = JschShell("192.168.130.134", 38322, "app", "wingtech")
+//val jschShell = JschShell("192.168.130.134", 38322, "app", "wingtech")
 
-val terminal = Terminal(jschShell, terminalConfig)
+val terminal = Terminal(localShell, terminalConfig)
 val terminal1 = Terminal(localShell1, terminalConfig)
 
 @Composable
