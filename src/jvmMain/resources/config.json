@@ -1,0 +1,10 @@
+{
+  "hosts": [
+    {
+      "host": "192.168.130.134",
+      "port": 38322,
+      "user": "app",
+      "password": "wingtech"
+    }
+  ]
+}
