@@ -82,7 +82,7 @@ class Terminal(val shell: Shell, val terminalConfig: TerminalConfig) {
             channelOutputStreamWriter.flush()
             return true
         }
-        return false
+        return true
     }
 
     private fun startReadFromChannel() {

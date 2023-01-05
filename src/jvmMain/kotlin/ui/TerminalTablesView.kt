@@ -38,18 +38,19 @@ fun TerminalTablesView(model: Terminals) = Row(Modifier.horizontalScroll(remembe
 }
 
 @Composable
-fun TerminalTableView(title: String, isActive: Boolean, onClick: () -> Unit, onClose: (() -> Unit)?) = Surface(
+fun TerminalTableView(
+    title: String,
+    isActive: Boolean,
+    onClick: () -> Unit,
+    onClose: (() -> Unit)?
+) = Surface(
     shape = RectangleShape,
     elevation = if (isActive) {
         10.dp
     } else {
         0.dp
     },
-    border = if (isActive) {
-        BorderStroke(1.dp, Color(0xFF2B2B2B))
-    } else {
-        null
-    }
+    color = if (isActive) AppTheme.colors.backgroundDark else Color.Transparent
 ) {
     Row(
         Modifier
@@ -63,7 +64,7 @@ fun TerminalTableView(title: String, isActive: Boolean, onClick: () -> Unit, onC
             title,
             color = LocalContentColor.current,
             fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp),
         )
 
         if (onClose != null) {

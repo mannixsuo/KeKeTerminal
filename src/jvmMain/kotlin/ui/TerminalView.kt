@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,17 +21,14 @@ import ui.Fonts.jetbrainsMono
 
 @Composable
 fun TerminalView(cursorX: Int = 0, cursorY: Int = 0, lines: List<ILine>) {
-// linesGenerator: (scope: CoroutineScope) -> List<ILine>
-//    val lines by loadableScoped(linesGenerator)
-
-    println("TerminalView $cursorX $cursorY ${lines.size}")
-
     Surface {
-        Column(modifier = Modifier.background(Color.Black).fillMaxWidth()) {
-            Text(color = Color.White, text = "cursor (X: ${cursorX}, Y:${cursorY})")
-            Lines(
-                lines, cursorX, cursorY
-            )
+        SelectionContainer {
+            Column(modifier = Modifier.background(Color.Black).fillMaxWidth()) {
+                Text(color = Color.White, text = "cursor (X: ${cursorX}, Y:${cursorY})")
+                Lines(
+                    lines, cursorX, cursorY
+                )
+            }
         }
     }
 }

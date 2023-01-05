@@ -21,6 +21,18 @@
       "port": 38322,
       "user": "app",
       "password": "wingtech"
+    },
+    {
+      "host": "192.168.130.135",
+      "port": 38322,
+      "user": "app",
+      "password": "wingtech"
+    },
+    {
+      "host": "192.168.130.136",
+      "port": 38322,
+      "user": "app",
+      "password": "wingtech"
     }
   ]
 }

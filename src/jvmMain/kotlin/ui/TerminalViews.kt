@@ -20,7 +20,10 @@ fun TerminalViews(model: CoCoTerminalAppState) {
     Box {
         Column {
             TerminalTablesView(model.terminals)
-            Box(Modifier.weight(1f).background(Color.Black)) {
+            Box(
+                Modifier.weight(1f)
+                .background(Color.Black)
+            ) {
                 TerminalView(
                     model.terminals.activeTerminalScreen.cursorX,
                     model.terminals.activeTerminalScreen.cursorY,
